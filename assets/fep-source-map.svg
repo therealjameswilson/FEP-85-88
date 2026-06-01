@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 620" role="img" aria-labelledby="title desc">
+  <title id="title">Volume XXXVII source map</title>
+  <desc id="desc">A compiler source map connecting trade policy, monetary policy, industrialized country cooperation, strategic trade controls, public papers, and boundary volumes.</desc>
+  <defs>
+    <linearGradient id="paper" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fbfaf4"/>
+      <stop offset="1" stop-color="#e8f1ef"/>
+    </linearGradient>
+    <linearGradient id="navy" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#14213d"/>
+      <stop offset="1" stop-color="#264f72"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#14213d" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="920" height="620" rx="38" fill="url(#paper)"/>
+  <path d="M77 110h766M77 204h766M77 298h766M77 392h766M77 486h766" stroke="#cad8d3" stroke-width="2" stroke-dasharray="6 12"/>
+  <path d="M150 85v450M312 85v450M474 85v450M636 85v450M798 85v450" stroke="#d9e2de" stroke-width="2"/>
+  <g fill="none" stroke-linecap="round" stroke-width="5" opacity="0.85">
+    <path d="M204 178C270 120 354 121 424 178S566 245 640 182" stroke="#2b8a78"/>
+    <path d="M226 365C300 318 357 318 430 365S565 434 690 352" stroke="#d9654b"/>
+    <path d="M208 280C286 250 339 252 416 284S572 325 704 276" stroke="#2d6f9f"/>
+    <path d="M276 478C356 430 451 428 540 474S678 525 746 474" stroke="#694b72"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="318" y="230" width="284" height="142" rx="16" fill="url(#navy)"/>
+    <text x="460" y="279" text-anchor="middle" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="23" font-weight="800">Volume XXXVII</text>
+    <text x="460" y="313" text-anchor="middle" fill="#dfeee9" font-family="Inter, Arial, sans-serif" font-size="15">Trade, monetary policy,</text>
+    <text x="460" y="338" text-anchor="middle" fill="#dfeee9" font-family="Inter, Arial, sans-serif" font-size="15">and industrialized cooperation</text>
+  </g>
+  <g font-family="Inter, Arial, sans-serif" font-weight="800" font-size="16">
+    <g>
+      <circle cx="204" cy="178" r="58" fill="#ffffff" stroke="#2b8a78" stroke-width="5"/>
+      <text x="204" y="172" text-anchor="middle" fill="#14213d">Trade</text>
+      <text x="204" y="195" text-anchor="middle" fill="#596a70" font-size="12" font-weight="700">GATT, FTA, Japan</text>
+    </g>
+    <g>
+      <circle cx="640" cy="182" r="58" fill="#ffffff" stroke="#2d6f9f" stroke-width="5"/>
+      <text x="640" y="176" text-anchor="middle" fill="#14213d">Monetary</text>
+      <text x="640" y="199" text-anchor="middle" fill="#596a70" font-size="12" font-weight="700">Plaza, Louvre</text>
+    </g>
+    <g>
+      <circle cx="218" cy="366" r="58" fill="#ffffff" stroke="#c7922f" stroke-width="5"/>
+      <text x="218" y="360" text-anchor="middle" fill="#14213d">Summits</text>
+      <text x="218" y="383" text-anchor="middle" fill="#596a70" font-size="12" font-weight="700">Tokyo, Venice, Toronto</text>
+    </g>
+    <g>
+      <circle cx="700" cy="354" r="58" fill="#ffffff" stroke="#694b72" stroke-width="5"/>
+      <text x="700" y="348" text-anchor="middle" fill="#14213d">Controls</text>
+      <text x="700" y="371" text-anchor="middle" fill="#596a70" font-size="12" font-weight="700">COCOM, technology</text>
+    </g>
+    <g>
+      <rect x="354" y="462" width="212" height="76" rx="14" fill="#ffffff" stroke="#d9654b" stroke-width="4"/>
+      <text x="460" y="493" text-anchor="middle" fill="#14213d">Boundary Rules</text>
+      <text x="460" y="518" text-anchor="middle" fill="#596a70" font-size="12" font-weight="700">Debt, aid, regional files</text>
+    </g>
+  </g>
+  <g fill="#152026" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">
+    <rect x="92" y="542" width="150" height="32" rx="8" fill="#ffffff" stroke="#cad8d3"/>
+    <text x="167" y="563" text-anchor="middle">NSDD copies</text>
+    <rect x="260" y="542" width="150" height="32" rx="8" fill="#ffffff" stroke="#cad8d3"/>
+    <text x="335" y="563" text-anchor="middle">Danzansky files</text>
+    <rect x="428" y="542" width="150" height="32" rx="8" fill="#ffffff" stroke="#cad8d3"/>
+    <text x="503" y="563" text-anchor="middle">Public Papers</text>
+    <rect x="596" y="542" width="150" height="32" rx="8" fill="#ffffff" stroke="#cad8d3"/>
+    <text x="671" y="563" text-anchor="middle">WHORM / diary</text>
+  </g>
+</svg>

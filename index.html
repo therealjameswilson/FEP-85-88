@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FRUS 1981-1988 Volume XXXVII Assist</title>
+    <meta
+      name="description"
+      content="A compiler-facing FRUS Assist page for Foreign Relations of the United States, 1981-1988, Volume XXXVII, Trade; Monetary Policy; Industrialized Country Cooperation, 1985-1988."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="FRUS Volume XXXVII Assist home">
+        <span class="brand-mark">37</span>
+        <span>FEP Desk</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#records">Chronology</a>
+        <a href="#workbench">Desk</a>
+        <a href="#selection-board">Selection</a>
+        <a href="#gap-tracker">Gaps</a>
+        <a href="#source-pools">Source Pools</a>
+        <a href="#request-packets">Requests</a>
+        <a href="#source-note-qa">Source QA</a>
+        <a href="#source-copy-ledger">Source Ledger</a>
+        <a href="persons.html">Persons</a>
+        <a href="#chapters">Lanes</a>
+        <a href="#policy-files">Policy Files</a>
+        <a href="#public-references">Public Line</a>
+        <a href="#boundary">Boundaries</a>
+        <a href="#sources">Sources</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="kicker">FRUS 1981-1988, Volume XXXVII</p>
+          <h1 id="hero-title">Trade; Monetary Policy; Industrialized Country Cooperation</h1>
+          <p class="lede">
+            A compiler desk for the 1985-1988 foreign economic policy volume:
+            trade frictions, exchange-rate diplomacy, G-7 summit coordination,
+            strategic trade controls, and the source boundaries that keep this
+            volume distinct from debt, aid, regional, and national-security files.
+          </p>
+          <div class="hero-actions" aria-label="Primary actions">
+            <a class="button primary" href="#records">Open Chronology</a>
+            <a class="button secondary" href="#gap-tracker">Review Gaps</a>
+            <a class="button secondary" href="https://history.state.gov/historicaldocuments/frus1981-88v37" rel="noreferrer">
+              Official Volume Page
+            </a>
+          </div>
+        </div>
+        <aside class="brief visual-brief" aria-label="Archive scope">
+          <img
+            class="archive-map"
+            src="assets/fep-source-map.svg"
+            alt="Research map connecting trade policy, monetary policy, economic summits, strategic trade controls, and boundary source pools"
+          />
+          <p class="brief-label">Volume Snapshot</p>
+          <dl>
+            <div>
+              <dt>FRUS Volume</dt>
+              <dd>1981-1988, XXXVII</dd>
+            </div>
+            <div>
+              <dt>Official Status</dt>
+              <dd>Being Researched</dd>
+            </div>
+            <div>
+              <dt>Coverage</dt>
+              <dd>1985-1988</dd>
+            </div>
+            <div>
+              <dt>Primary Intake</dt>
+              <dd>Reagan Library / Public Papers / NSDD reference copies</dd>
+            </div>
+            <div>
+              <dt>Source-Note Model</dt>
+              <dd>FRUS 1977-1980, Volume III</dd>
+            </div>
+          </dl>
+        </aside>
+      </section>
+
+      <section class="section records-section" id="records" aria-labelledby="records-title">
+        <div class="section-heading">
+          <p class="kicker">Declassified And Public Chronology</p>
+          <h2 id="records-title">First-Pass Volume XXXVII Leads</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter records">
+          <label class="search-field">
+            <span>Search documents</span>
+            <input id="record-search" type="search" placeholder="Search people, topics, countries, source notes" />
+          </label>
+          <label>
+            <span>Lane</span>
+            <select id="chapter-filter"></select>
+          </label>
+          <label>
+            <span>Country</span>
+            <select id="country-filter"></select>
+          </label>
+          <label>
+            <span>Release</span>
+            <select id="release-filter"></select>
+          </label>
+          <label>
+            <span>Document</span>
+            <select id="availability-filter"></select>
+          </label>
+          <button id="clear-record-filters" type="button">Reset</button>
+          <button id="export-records" type="button">CSV</button>
+          <p id="records-summary" class="summary">Loading chronology...</p>
+        </div>
+        <div id="records-root" class="records-root" aria-live="polite">
+          <p class="loading">Loading chronology leads...</p>
+        </div>
+      </section>
+
+      <section class="stats" aria-label="Volume summary">
+        <div>
+          <span id="total-records">0</span>
+          <p>chronology leads</p>
+        </div>
+        <div>
+          <span id="total-pages">0</span>
+          <p>open web/PDF anchors</p>
+        </div>
+        <div>
+          <span id="policy-count">0</span>
+          <p>policy file anchors</p>
+        </div>
+        <div>
+          <span id="public-count">0</span>
+          <p>public-line references</p>
+        </div>
+        <div>
+          <span id="boundary-count">0</span>
+          <p>boundary rows</p>
+        </div>
+      </section>
+
+      <section class="section compiler-section" id="workbench" aria-labelledby="workbench-title">
+        <div class="section-heading">
+          <p class="kicker">Compiler Desk</p>
+          <h2 id="workbench-title">Selection And Boundary Cockpit</h2>
+        </div>
+        <div id="workbench-root" class="workbench-root" aria-live="polite">
+          <p class="loading">Loading compiler desk...</p>
+        </div>
+      </section>
+
+      <section class="section selection-section" id="selection-board" aria-labelledby="selection-title">
+        <div class="section-heading">
+          <p class="kicker">Selection Board</p>
+          <h2 id="selection-title">Draft, Context, Boundary, And Request-First Calls</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter selection board">
+          <label class="search-field">
+            <span>Search selections</span>
+            <input id="selection-search" type="search" placeholder="Search title, rationale, boundary risk, next action" />
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="selection-status-filter"></select>
+          </label>
+          <label>
+            <span>Lane</span>
+            <select id="selection-lane-filter"></select>
+          </label>
+          <button id="clear-selection-filters" type="button">Reset</button>
+          <button id="export-selections" type="button">CSV</button>
+          <p id="selection-summary" class="summary">Loading selection board...</p>
+        </div>
+        <div id="selection-root" class="records-root compact-records" aria-live="polite">
+          <p class="loading">Loading selection board...</p>
+        </div>
+      </section>
+
+      <section class="section gap-section" id="gap-tracker" aria-labelledby="gap-title">
+        <div class="section-heading">
+          <p class="kicker">Gap Tracker</p>
+          <h2 id="gap-title">What Still Has To Be Found</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter gap tracker">
+          <label class="search-field">
+            <span>Search gaps</span>
+            <input id="gap-search" type="search" placeholder="Search problems, evidence, terms, source pools" />
+          </label>
+          <label>
+            <span>Lane</span>
+            <select id="gap-lane-filter"></select>
+          </label>
+          <label>
+            <span>Priority</span>
+            <select id="gap-priority-filter"></select>
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="gap-status-filter"></select>
+          </label>
+          <button id="clear-gap-filters" type="button">Reset</button>
+          <button id="export-gaps" type="button">CSV</button>
+          <p id="gap-summary" class="summary">Loading gap tracker...</p>
+        </div>
+        <div id="gap-root" class="gap-grid" aria-live="polite">
+          <p class="loading">Loading gap tracker...</p>
+        </div>
+      </section>
+
+      <section class="section source-pool-section" id="source-pools" aria-labelledby="source-pools-title">
+        <div class="section-heading">
+          <p class="kicker">Source Pools</p>
+          <h2 id="source-pools-title">Next Harvest Queue</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter source pools">
+          <label class="search-field">
+            <span>Search pools</span>
+            <input id="source-pool-search" type="search" placeholder="Search source pool, coverage, next use" />
+          </label>
+          <label>
+            <span>Lane</span>
+            <select id="source-pool-lane-filter"></select>
+          </label>
+          <label>
+            <span>Priority</span>
+            <select id="source-pool-priority-filter"></select>
+          </label>
+          <button id="clear-source-pool-filters" type="button">Reset</button>
+          <button id="export-source-pools" type="button">CSV</button>
+          <p id="source-pool-summary" class="summary">Loading source pools...</p>
+        </div>
+        <div id="source-pool-root" class="file-grid" aria-live="polite">
+          <p class="loading">Loading source pools...</p>
+        </div>
+      </section>
+
+      <section class="section request-section" id="request-packets" aria-labelledby="request-title">
+        <div class="section-heading">
+          <p class="kicker">Request Packets</p>
+          <h2 id="request-title">Archive Asks Ready To Send</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter request packets">
+          <label class="search-field">
+            <span>Search requests</span>
+            <input id="request-search" type="search" placeholder="Search repository, ask text, lane, source-note target" />
+          </label>
+          <label>
+            <span>Repository</span>
+            <select id="request-repository-filter"></select>
+          </label>
+          <label>
+            <span>Priority</span>
+            <select id="request-priority-filter"></select>
+          </label>
+          <button id="clear-request-filters" type="button">Reset</button>
+          <button id="export-requests" type="button">CSV</button>
+          <p id="request-summary" class="summary">Loading request packets...</p>
+        </div>
+        <div id="request-root" class="file-grid" aria-live="polite">
+          <p class="loading">Loading request packets...</p>
+        </div>
+      </section>
+
+      <section class="section source-note-section" id="source-note-qa" aria-labelledby="source-note-title">
+        <div class="section-heading">
+          <p class="kicker">Source-Note QA</p>
+          <h2 id="source-note-title">Citation Readiness Audit</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter source-note audit">
+          <label class="search-field">
+            <span>Search notes</span>
+            <input id="source-note-search" type="search" placeholder="Search note text, title, section, flags" />
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="source-note-status-filter"></select>
+          </label>
+          <label>
+            <span>Section</span>
+            <select id="source-note-section-filter"></select>
+          </label>
+          <button id="clear-source-note-filters" type="button">Reset</button>
+          <button id="export-source-notes" type="button">CSV</button>
+          <p id="source-note-summary" class="summary">Loading source-note audit...</p>
+        </div>
+        <div id="source-note-root" class="file-grid" aria-live="polite">
+          <p class="loading">Loading source-note audit...</p>
+        </div>
+      </section>
+
+      <section class="section ledger-section" id="source-copy-ledger" aria-labelledby="ledger-title">
+        <div class="section-heading">
+          <p class="kicker">Source-Copy Ledger</p>
+          <h2 id="ledger-title">Partials, Research-Room Leads, And Verification Rows</h2>
+        </div>
+        <p id="ledger-summary" class="summary ledger-summary">Loading source-copy ledger...</p>
+        <div id="ledger-root" class="records-root compact-records" aria-live="polite">
+          <p class="loading">Loading source-copy ledger...</p>
+        </div>
+      </section>
+
+      <section class="section" id="chapters" aria-labelledby="chapters-title">
+        <div class="section-heading">
+          <p class="kicker">Research Lanes</p>
+          <h2 id="chapters-title">Volume Working Structure</h2>
+        </div>
+        <div id="chapter-grid" class="chapter-grid" aria-live="polite"></div>
+      </section>
+
+      <section class="section policy-section" id="policy-files" aria-labelledby="policy-title">
+        <div class="section-heading">
+          <p class="kicker">NSC / WHORM / Treasury / FRUS</p>
+          <h2 id="policy-title">High-Value Policy File Anchors</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter policy files">
+          <label class="search-field">
+            <span>Search files</span>
+            <input id="policy-search" type="search" placeholder="Search title, lane, repository, source note" />
+          </label>
+          <label>
+            <span>Lane</span>
+            <select id="policy-lane-filter"></select>
+          </label>
+          <label>
+            <span>Priority</span>
+            <select id="policy-priority-filter"></select>
+          </label>
+          <button id="clear-policy-filters" type="button">Reset</button>
+          <button id="export-policy" type="button">CSV</button>
+          <p id="policy-summary" class="summary">Loading policy file index...</p>
+        </div>
+        <div id="policy-root" class="file-grid" aria-live="polite">
+          <p class="loading">Loading policy files...</p>
+        </div>
+      </section>
+
+      <section class="section public-section" id="public-references" aria-labelledby="public-title">
+        <div class="section-heading">
+          <p class="kicker">Public Papers</p>
+          <h2 id="public-title">Public-Line Reference Layer</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter public references">
+          <label class="search-field">
+            <span>Search references</span>
+            <input id="public-search" type="search" placeholder="Search statements, terms, citations" />
+          </label>
+          <label>
+            <span>Lane</span>
+            <select id="public-lane-filter"></select>
+          </label>
+          <button id="clear-public-filters" type="button">Reset</button>
+          <button id="export-public" type="button">CSV</button>
+          <p id="public-summary" class="summary">Loading public reference index...</p>
+        </div>
+        <div id="public-root" class="file-grid" aria-live="polite">
+          <p class="loading">Loading public references...</p>
+        </div>
+      </section>
+
+      <section class="section boundary-section" id="boundary" aria-labelledby="boundary-title">
+        <div class="section-heading">
+          <p class="kicker">Boundary Control</p>
+          <h2 id="boundary-title">Adjacent Volumes And Exclusion Rules</h2>
+        </div>
+        <div class="tools" aria-label="Search boundary records">
+          <label class="search-field">
+            <span>Search boundary rows</span>
+            <input id="boundary-search" type="search" placeholder="Search country, person, title, adjacent volume" />
+          </label>
+          <label>
+            <span>Country</span>
+            <select id="boundary-country-filter"></select>
+          </label>
+          <button id="clear-boundary-filters" type="button">Reset</button>
+          <p id="boundary-summary" class="summary">Loading boundary index...</p>
+        </div>
+        <div id="boundary-root" class="records-root compact-records" aria-live="polite">
+          <p class="loading">Loading boundary records...</p>
+        </div>
+      </section>
+
+      <section class="section sources-section" id="sources" aria-labelledby="sources-title">
+        <div class="section-heading">
+          <p class="kicker">Source Base</p>
+          <h2 id="sources-title">Refresh And Verification Anchors</h2>
+        </div>
+        <div class="source-grid">
+          <article>
+            <h3>Official Volume</h3>
+            <p>
+              <a href="https://history.state.gov/historicaldocuments/frus1981-88v37">History.state.gov Volume XXXVII</a>
+              and the <a href="https://history.state.gov/historicaldocuments/reagan">Reagan administration volume list</a>.
+            </p>
+          </article>
+          <article>
+            <h3>NSDD Reference Copies</h3>
+            <p>
+              <a href="https://www.reaganlibrary.gov/reagans/reagan-administration/nsdd-digitized-reference-copies">
+                Reagan Library digitized NSDD copies
+              </a>
+              for summit preparation, trade, strategic controls, and bilateral economic directives.
+            </p>
+          </article>
+          <article>
+            <h3>Public Papers</h3>
+            <p>
+              <a href="https://www.reaganlibrary.gov/archives/public-papers-president-ronald-reagan">Reagan Public Papers</a>
+              and GovInfo packages for public-line chronology, speech comparison, and editorial notes.
+            </p>
+          </article>
+          <article>
+            <h3>White House Files</h3>
+            <p>
+              Reagan Library finding aids for Stephen Danzansky, WHORM Trade, daily diary, NSC Executive Secretariat,
+              and economic summit preparation files.
+            </p>
+          </article>
+          <article>
+            <h3>NARA Record Groups</h3>
+            <p>
+              <a href="https://history.state.gov/historicaldocuments/frus1977-80v03/sources">FRUS 1977-1980, Volume III sources</a>
+              model Kathleen B. Rasmussen's RG 56, RG 59, and RG 364 source-note formats for Treasury, State, and trade records.
+            </p>
+          </article>
+          <article>
+            <h3>Source-Note Rule</h3>
+            <p>
+              Copy-ready notes use <code>Source:</code> only after repository, collection, box, folder,
+              and classification are specific. Incomplete archival leads stay marked as <code>Source-note target</code>.
+            </p>
+          </article>
+          <article>
+            <h3>Persons Authority</h3>
+            <p>
+              <a href="persons.html">Volume XXXVII Persons</a> generated from public source text,
+              known Reagan administration officials, G-7 counterpart leads, and compiler gap targets.
+            </p>
+          </article>
+          <article>
+            <h3>Local Refresh</h3>
+            <pre><code>python3 -m http.server 4197
+node --check app.js
+node --check persons.js</code></pre>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>FRUS Assist for Volume XXXVII. Data generated from public source records, official volume metadata, and first-pass compiler source lanes.</p>
+    </footer>
+
+    <script src="data/volume-data.js"></script>
+    <script src="data/persons.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
