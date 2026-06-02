@@ -15,7 +15,9 @@ Official volume page: <https://history.state.gov/historicaldocuments/frus1981-88
 - searchable/exportable source pools
 - searchable/exportable request packets with copy-ready Reagan Library and NARA ask text
 - source-note QA audit for ready notes, target notes, references, and rows needing review
+- source-note pattern lab for Reagan Library, NARA, Public Papers, NSDD, and Daily Diary citation formats
 - selection board for draft candidates, context anchors, request-first leads, and boundary/exclusion calls
+- production-readiness worksheet for draft packages, citation review, attachment checks, request-first blockers, and boundary holds
 - chapter briefs with document spines, must-harvest items, annotation questions, exclusion rules, and copyable assembly memos
 - source-copy ledger for attachment checks, missing channels, and public-private bridge work
 - policy file anchors for Reagan Library, Public Papers, Treasury/Fed routing, and adjacent FRUS volumes

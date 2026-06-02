@@ -9,6 +9,8 @@ const sourcePools = window.SOURCE_POOLS || [];
 const requestPackets = window.REQUEST_PACKETS || [];
 const selectionBoard = window.SELECTION_BOARD || [];
 const chapterBriefs = window.CHAPTER_BRIEFS || [];
+const sourceNotePatterns = window.SOURCE_NOTE_PATTERNS || [];
+const productionReadiness = window.PRODUCTION_READINESS || [];
 const sourceCopyLedger = window.SOURCE_COPY_LEDGER || [];
 const chapters = meta.chapters || [];
 const sourceNoteAudit = buildSourceNoteAudit();
@@ -39,6 +41,12 @@ const state = {
     status: "",
     lane: ""
   },
+  production: {
+    query: "",
+    stage: "",
+    lane: "",
+    priority: ""
+  },
   chapterBriefs: {
     query: "",
     lane: "",
@@ -64,6 +72,12 @@ const state = {
     query: "",
     status: "",
     section: ""
+  },
+  sourceNotePatterns: {
+    query: "",
+    repository: "",
+    lane: "",
+    status: ""
   }
 };
 
@@ -109,6 +123,14 @@ const nodes = {
   selectionLaneFilter: document.querySelector("#selection-lane-filter"),
   clearSelectionFilters: document.querySelector("#clear-selection-filters"),
   exportSelections: document.querySelector("#export-selections"),
+  productionRoot: document.querySelector("#production-root"),
+  productionSummary: document.querySelector("#production-summary"),
+  productionSearch: document.querySelector("#production-search"),
+  productionStageFilter: document.querySelector("#production-stage-filter"),
+  productionLaneFilter: document.querySelector("#production-lane-filter"),
+  productionPriorityFilter: document.querySelector("#production-priority-filter"),
+  clearProductionFilters: document.querySelector("#clear-production-filters"),
+  exportProduction: document.querySelector("#export-production"),
   chapterBriefRoot: document.querySelector("#chapter-brief-root"),
   chapterBriefSummary: document.querySelector("#chapter-brief-summary"),
   chapterBriefSearch: document.querySelector("#chapter-brief-search"),
@@ -145,6 +167,14 @@ const nodes = {
   sourceNoteSectionFilter: document.querySelector("#source-note-section-filter"),
   clearSourceNoteFilters: document.querySelector("#clear-source-note-filters"),
   exportSourceNotes: document.querySelector("#export-source-notes"),
+  sourceNotePatternRoot: document.querySelector("#source-note-pattern-root"),
+  sourceNotePatternSummary: document.querySelector("#source-note-pattern-summary"),
+  sourceNotePatternSearch: document.querySelector("#source-note-pattern-search"),
+  sourceNotePatternRepositoryFilter: document.querySelector("#source-note-pattern-repository-filter"),
+  sourceNotePatternLaneFilter: document.querySelector("#source-note-pattern-lane-filter"),
+  sourceNotePatternStatusFilter: document.querySelector("#source-note-pattern-status-filter"),
+  clearSourceNotePatternFilters: document.querySelector("#clear-source-note-pattern-filters"),
+  exportSourceNotePatterns: document.querySelector("#export-source-note-patterns"),
   ledgerRoot: document.querySelector("#ledger-root"),
   ledgerSummary: document.querySelector("#ledger-summary")
 };
@@ -230,6 +260,16 @@ function searchText(item) {
     item.boundaryRisk,
     item.annotationLead,
     item.sourceLead,
+    item.stage,
+    item.selectionStatus,
+    item.sourceReadiness,
+    item.sourceNoteReadiness,
+    item.copyStatus,
+    item.annotationLoad,
+    item.boundaryDisposition,
+    item.blocker,
+    item.compilerMove,
+    item.sourcePattern,
     item.workingTitle,
     item.thesis,
     item.documentSpine?.join(" "),
@@ -244,6 +284,13 @@ function searchText(item) {
     item.section,
     item.assessment,
     item.flags?.join(" "),
+    item.patternType,
+    item.precedent,
+    item.sourceBase,
+    item.template,
+    item.volume37Use,
+    item.readyWhen?.join(" "),
+    item.rejectIf?.join(" "),
     item.status,
     item.citation,
     item.matchedTerms?.join(" "),
@@ -355,6 +402,8 @@ function renderWorkbench() {
   const criticalGaps = gapTracker.filter((gap) => gap.priority === "Critical");
   const criticalRequests = requestPackets.filter((item) => item.priority === "Critical");
   const draftSelections = selectionBoard.filter((item) => item.status === "Draft candidate");
+  const requestFirstRows = productionReadiness.filter((item) => item.stage === "Request first");
+  const draftReadyRows = productionReadiness.filter((item) => item.stage === "Draft package");
   const sourceMix = topCounts(records, (record) => record.source?.series || "Catalog item")
     .slice(0, 3)
     .map(([label, count]) => `${count} ${label}`)
@@ -363,9 +412,9 @@ function renderWorkbench() {
   nodes.workbenchRoot.replaceChildren(
     metricCard("Chronology leads", records.length, `${openReferences.length} open web/PDF anchors across NSDDs, summit records, and Public Papers.`),
     metricCard("Selection calls", selectionBoard.length, `${draftSelections.length} draft candidates and ${criticalRequests.length} critical archive asks are ready for compiler triage.`),
+    metricCard("Production rows", productionReadiness.length, `${draftReadyRows.length} draft packages can move now; ${requestFirstRows.length} request-first rows block the trade/monetary spine.`),
     metricCard("Summit spine", summitRecords.length, "Tokyo, Venice, Toronto, and G-7 preparation records to anchor industrialized-country cooperation."),
-    metricCard("Policy anchors", nonBoundaryPolicy.length, `Finding aids and source pools for NSC, WHORM, Public Papers, Treasury, and diary checks. ${sourceMix}`),
-    metricCard("Open critical gaps", criticalGaps.length, `${gapTracker.length} total gap-tracker items now drive the next source harvest.`)
+    metricCard("Open critical gaps", criticalGaps.length, `${gapTracker.length} total gap-tracker items now drive the next source harvest. ${sourceMix}`)
   );
 }
 
@@ -659,6 +708,102 @@ function sourceNoteCard(row) {
   return card;
 }
 
+function filteredSourceNotePatterns() {
+  return sourceNotePatterns.filter((pattern) => {
+    if (!matchesQuery(pattern, state.sourceNotePatterns.query)) return false;
+    if (state.sourceNotePatterns.repository && pattern.repository !== state.sourceNotePatterns.repository) return false;
+    if (state.sourceNotePatterns.lane && pattern.lane !== state.sourceNotePatterns.lane) return false;
+    if (state.sourceNotePatterns.status && pattern.status !== state.sourceNotePatterns.status) return false;
+    return true;
+  });
+}
+
+function renderSourceNotePatterns() {
+  const statusOrder = new Map([
+    ["Copy-ready pattern", 1],
+    ["Target-only pattern", 2],
+    ["Published reference", 3],
+    ["Corroboration only", 4]
+  ]);
+  const visible = filteredSourceNotePatterns().sort(
+    (a, b) =>
+      (statusOrder.get(a.status) || 99) - (statusOrder.get(b.status) || 99) ||
+      a.repository.localeCompare(b.repository) ||
+      a.patternType.localeCompare(b.patternType)
+  );
+  const counts = topCounts(sourceNotePatterns, (pattern) => pattern.status)
+    .map(([label, count]) => `${count} ${label.toLowerCase()}`)
+    .join("; ");
+  nodes.sourceNotePatternSummary.textContent = `${plural(visible.length, "pattern")} visible from ${sourceNotePatterns.length} source-note templates. ${counts}.`;
+  nodes.sourceNotePatternRoot.replaceChildren(...visible.map(sourceNotePatternCard));
+  if (!visible.length) nodes.sourceNotePatternRoot.innerHTML = '<p class="empty">No source-note patterns match the current filters.</p>';
+}
+
+function sourceNotePatternCard(pattern) {
+  const card = document.createElement("article");
+  card.className = `file-card source-note-pattern-card status-${slug(pattern.status)}`;
+
+  const header = document.createElement("header");
+  const titleBlock = document.createElement("div");
+  const meta = document.createElement("div");
+  meta.className = "file-meta";
+  meta.append(textSpan(pattern.id), textSpan(pattern.repository), textSpan(pattern.status));
+  const title = document.createElement("h3");
+  title.textContent = pattern.patternType;
+  titleBlock.append(meta, title);
+  header.append(titleBlock);
+
+  const chips = document.createElement("div");
+  chips.className = "chips";
+  chips.append(
+    chip(pattern.lane),
+    chip(pattern.status, pattern.status === "Copy-ready pattern" ? "good" : pattern.status === "Target-only pattern" ? "warn" : "boundary")
+  );
+
+  const precedent = document.createElement("p");
+  precedent.textContent = pattern.precedent;
+  const template = document.createElement("p");
+  template.className = "source-note";
+  template.textContent = pattern.template;
+  const use = document.createElement("p");
+  use.textContent = pattern.volume37Use;
+
+  const ready = briefList("Ready when", pattern.readyWhen);
+  const reject = briefList("Reject if", pattern.rejectIf);
+
+  const actions = document.createElement("div");
+  actions.className = "file-actions";
+  if (pattern.precedentUrl) actions.append(linkButton("Precedent", pattern.precedentUrl));
+  if (pattern.sourceBaseUrl) actions.append(linkButton("Source base", pattern.sourceBaseUrl));
+  actions.append(copyButton(pattern.template, "Copy template"));
+  actions.append(copyButton(sourceNotePatternMemo(pattern), "Copy pattern memo"));
+
+  card.append(header, chips, precedent, template, use, ready, reject, actions);
+  return card;
+}
+
+function sourceNotePatternMemo(pattern) {
+  return [
+    `${pattern.id}: ${pattern.patternType}`,
+    `Repository: ${pattern.repository}`,
+    `Lane: ${pattern.lane}`,
+    `Status: ${pattern.status}`,
+    "",
+    `Template: ${pattern.template}`,
+    "",
+    `Precedent: ${pattern.precedent}`,
+    `Source base: ${pattern.sourceBase}`,
+    "",
+    `Volume XXXVII use: ${pattern.volume37Use}`,
+    "",
+    "Ready when:",
+    ...(pattern.readyWhen || []).map((item) => `- ${item}`),
+    "",
+    "Reject if:",
+    ...(pattern.rejectIf || []).map((item) => `- ${item}`)
+  ].join("\n");
+}
+
 function filteredSelectionBoard() {
   return selectionBoard.filter((item) => {
     if (!matchesQuery(item, state.selections.query)) return false;
@@ -753,6 +898,124 @@ function selectionMemo(item) {
     `Boundary risk: ${item.boundaryRisk}`,
     `Next action: ${item.nextAction}`,
     `Annotation lead: ${item.annotationLead}`,
+    `Source note: ${item.sourceNote}`
+  ].join("\n");
+}
+
+function filteredProductionReadiness() {
+  return productionReadiness.filter((item) => {
+    if (!matchesQuery(item, state.production.query)) return false;
+    if (state.production.stage && item.stage !== state.production.stage) return false;
+    if (state.production.lane && item.lane !== state.production.lane) return false;
+    if (state.production.priority && item.priority !== state.production.priority) return false;
+    return true;
+  });
+}
+
+function renderProductionReadiness() {
+  const stageOrder = new Map([
+    ["Request first", 1],
+    ["Attachment check", 2],
+    ["Citation review", 3],
+    ["Draft package", 4],
+    ["Context anchor", 5],
+    ["Boundary hold", 6]
+  ]);
+  const priorityOrder = new Map([
+    ["Critical", 1],
+    ["High", 2],
+    ["Medium", 3],
+    ["Low", 4]
+  ]);
+  const visible = filteredProductionReadiness().sort(
+    (a, b) =>
+      (stageOrder.get(a.stage) || 99) - (stageOrder.get(b.stage) || 99) ||
+      (priorityOrder.get(a.priority) || 99) - (priorityOrder.get(b.priority) || 99) ||
+      a.lane.localeCompare(b.lane) ||
+      a.title.localeCompare(b.title)
+  );
+  const counts = topCounts(productionReadiness, (item) => item.stage)
+    .map(([label, count]) => `${count} ${label.toLowerCase()}`)
+    .join("; ");
+  nodes.productionSummary.textContent = `${plural(visible.length, "readiness row")} visible from ${productionReadiness.length} production-control rows. ${counts}.`;
+  nodes.productionRoot.replaceChildren(...visible.map(productionReadinessCard));
+  if (!visible.length) nodes.productionRoot.innerHTML = '<p class="empty">No production-readiness rows match the current filters.</p>';
+}
+
+function productionReadinessCard(item) {
+  const card = document.createElement("article");
+  card.className = `record-card production-card stage-${slug(item.stage)}`;
+
+  const header = document.createElement("header");
+  const titleBlock = document.createElement("div");
+  const meta = document.createElement("div");
+  meta.className = "record-id";
+  meta.append(textSpan(item.id), textSpan(item.recordId), textSpan(item.dateText), textSpan(item.priority));
+  const title = document.createElement("h4");
+  title.textContent = item.title;
+  titleBlock.append(meta, title);
+
+  const chips = document.createElement("div");
+  chips.className = "chips";
+  chips.append(
+    chip(item.stage, item.stage === "Draft package" ? "good" : item.stage === "Request first" || item.stage === "Attachment check" ? "warn" : "boundary"),
+    chip(item.lane),
+    chip(item.selectionStatus)
+  );
+  header.append(titleBlock, chips);
+
+  const source = document.createElement("p");
+  source.className = "source-note";
+  source.textContent = `Source readiness: ${item.sourceReadiness}`;
+  const sourceNote = document.createElement("p");
+  sourceNote.className = "source-note";
+  sourceNote.textContent = `Source-note readiness: ${item.sourceNoteReadiness}`;
+  const copy = document.createElement("p");
+  copy.className = "source-note";
+  copy.textContent = `Copy status: ${item.copyStatus}`;
+  const annotation = document.createElement("p");
+  annotation.className = "source-note";
+  annotation.textContent = `Annotation load: ${item.annotationLoad}`;
+  const boundary = document.createElement("p");
+  boundary.className = "source-note";
+  boundary.textContent = `Boundary disposition: ${item.boundaryDisposition}`;
+  const blocker = document.createElement("p");
+  blocker.className = "source-note";
+  blocker.textContent = `Blocker: ${item.blocker}`;
+  const move = document.createElement("p");
+  move.textContent = item.compilerMove;
+
+  const actions = document.createElement("div");
+  actions.className = "record-actions";
+  if (item.catalogUrl) actions.append(linkButton(item.catalogLabel || "Source", item.catalogUrl));
+  if (item.pdfUrl) actions.append(linkButton("PDF", item.pdfUrl));
+  if (item.sourceNote) actions.append(copyButton(item.sourceNote, "Copy source note"));
+  actions.append(copyButton(productionReadinessMemo(item), "Copy readiness memo"));
+
+  card.append(header, move, source, sourceNote, copy, annotation, boundary, blocker, actions);
+  return card;
+}
+
+function productionReadinessMemo(item) {
+  return [
+    `${item.stage}: ${item.title}`,
+    `Readiness ID: ${item.id}`,
+    `Record ID: ${item.recordId}`,
+    `Date: ${item.dateText}`,
+    `Lane: ${item.lane}`,
+    `Priority: ${item.priority}`,
+    `Selection status: ${item.selectionStatus}`,
+    "",
+    `Source readiness: ${item.sourceReadiness}`,
+    `Source-note readiness: ${item.sourceNoteReadiness}`,
+    `Copy status: ${item.copyStatus}`,
+    `Annotation load: ${item.annotationLoad}`,
+    `Boundary disposition: ${item.boundaryDisposition}`,
+    "",
+    `Next action: ${item.nextAction}`,
+    `Blocker: ${item.blocker}`,
+    `Compiler move: ${item.compilerMove}`,
+    `Source-note pattern: ${item.sourcePattern}`,
     `Source note: ${item.sourceNote}`
   ].join("\n");
 }
@@ -948,6 +1211,9 @@ function populateFilters() {
   addOptions(nodes.boundaryCountryFilter, uniqueSorted(boundaryRecords.map((record) => record.country)), "All countries");
   addOptions(nodes.selectionStatusFilter, uniqueSorted(selectionBoard.map((item) => item.status)), "All statuses");
   addOptions(nodes.selectionLaneFilter, uniqueSorted(selectionBoard.map((item) => item.lane)), "All lanes");
+  addOptions(nodes.productionStageFilter, uniqueSorted(productionReadiness.map((item) => item.stage)), "All stages");
+  addOptions(nodes.productionLaneFilter, uniqueSorted(productionReadiness.map((item) => item.lane)), "All lanes");
+  addOptions(nodes.productionPriorityFilter, uniqueSorted(productionReadiness.map((item) => item.priority)), "All priorities");
   addOptions(nodes.chapterBriefLaneFilter, uniqueSorted(chapterBriefs.map((brief) => brief.lane)), "All lanes");
   addOptions(nodes.chapterBriefUrgencyFilter, uniqueSorted(chapterBriefs.map((brief) => brief.urgency)), "All urgencies");
   addOptions(nodes.gapLaneFilter, uniqueSorted(gapTracker.map((gap) => gap.lane)), "All lanes");
@@ -959,6 +1225,9 @@ function populateFilters() {
   addOptions(nodes.requestPriorityFilter, uniqueSorted(requestPackets.map((packet) => packet.priority)), "All priorities");
   addOptions(nodes.sourceNoteStatusFilter, uniqueSorted(sourceNoteAudit.map((row) => row.assessment)), "All statuses");
   addOptions(nodes.sourceNoteSectionFilter, uniqueSorted(sourceNoteAudit.map((row) => row.section)), "All sections");
+  addOptions(nodes.sourceNotePatternRepositoryFilter, uniqueSorted(sourceNotePatterns.map((pattern) => pattern.repository)), "All repositories");
+  addOptions(nodes.sourceNotePatternLaneFilter, uniqueSorted(sourceNotePatterns.map((pattern) => pattern.lane)), "All lanes");
+  addOptions(nodes.sourceNotePatternStatusFilter, uniqueSorted(sourceNotePatterns.map((pattern) => pattern.status)), "All statuses");
 }
 
 function filteredRecords() {
@@ -1466,6 +1735,51 @@ function setupEvents() {
     );
   });
 
+  nodes.sourceNotePatternSearch.addEventListener("input", (event) => {
+    state.sourceNotePatterns.query = event.target.value;
+    renderSourceNotePatterns();
+  });
+  nodes.sourceNotePatternRepositoryFilter.addEventListener("change", (event) => {
+    state.sourceNotePatterns.repository = event.target.value;
+    renderSourceNotePatterns();
+  });
+  nodes.sourceNotePatternLaneFilter.addEventListener("change", (event) => {
+    state.sourceNotePatterns.lane = event.target.value;
+    renderSourceNotePatterns();
+  });
+  nodes.sourceNotePatternStatusFilter.addEventListener("change", (event) => {
+    state.sourceNotePatterns.status = event.target.value;
+    renderSourceNotePatterns();
+  });
+  nodes.clearSourceNotePatternFilters.addEventListener("click", () => {
+    state.sourceNotePatterns = { query: "", repository: "", lane: "", status: "" };
+    nodes.sourceNotePatternSearch.value = "";
+    nodes.sourceNotePatternRepositoryFilter.value = "";
+    nodes.sourceNotePatternLaneFilter.value = "";
+    nodes.sourceNotePatternStatusFilter.value = "";
+    renderSourceNotePatterns();
+  });
+  nodes.exportSourceNotePatterns.addEventListener("click", () => {
+    downloadCsv(
+      "frus-volume37-source-note-patterns.csv",
+      toCsv(filteredSourceNotePatterns(), [
+        { label: "ID", value: (pattern) => pattern.id },
+        { label: "Status", value: (pattern) => pattern.status },
+        { label: "Repository", value: (pattern) => pattern.repository },
+        { label: "Lane", value: (pattern) => pattern.lane },
+        { label: "Pattern Type", value: (pattern) => pattern.patternType },
+        { label: "Template", value: (pattern) => pattern.template },
+        { label: "Precedent", value: (pattern) => pattern.precedent },
+        { label: "Precedent URL", value: (pattern) => pattern.precedentUrl },
+        { label: "Source Base", value: (pattern) => pattern.sourceBase },
+        { label: "Source Base URL", value: (pattern) => pattern.sourceBaseUrl },
+        { label: "Volume XXXVII Use", value: (pattern) => pattern.volume37Use },
+        { label: "Ready When", value: (pattern) => (pattern.readyWhen || []).join("; ") },
+        { label: "Reject If", value: (pattern) => (pattern.rejectIf || []).join("; ") }
+      ])
+    );
+  });
+
   nodes.selectionSearch.addEventListener("input", (event) => {
     state.selections.query = event.target.value;
     renderSelectionBoard();
@@ -1500,6 +1814,58 @@ function setupEvents() {
         { label: "Boundary Risk", value: (item) => item.boundaryRisk },
         { label: "Next Action", value: (item) => item.nextAction },
         { label: "Annotation Lead", value: (item) => item.annotationLead },
+        { label: "Source Note", value: (item) => item.sourceNote },
+        { label: "Source URL", value: (item) => item.catalogUrl },
+        { label: "PDF URL", value: (item) => item.pdfUrl }
+      ])
+    );
+  });
+
+  nodes.productionSearch.addEventListener("input", (event) => {
+    state.production.query = event.target.value;
+    renderProductionReadiness();
+  });
+  nodes.productionStageFilter.addEventListener("change", (event) => {
+    state.production.stage = event.target.value;
+    renderProductionReadiness();
+  });
+  nodes.productionLaneFilter.addEventListener("change", (event) => {
+    state.production.lane = event.target.value;
+    renderProductionReadiness();
+  });
+  nodes.productionPriorityFilter.addEventListener("change", (event) => {
+    state.production.priority = event.target.value;
+    renderProductionReadiness();
+  });
+  nodes.clearProductionFilters.addEventListener("click", () => {
+    state.production = { query: "", stage: "", lane: "", priority: "" };
+    nodes.productionSearch.value = "";
+    nodes.productionStageFilter.value = "";
+    nodes.productionLaneFilter.value = "";
+    nodes.productionPriorityFilter.value = "";
+    renderProductionReadiness();
+  });
+  nodes.exportProduction.addEventListener("click", () => {
+    downloadCsv(
+      "frus-volume37-production-readiness.csv",
+      toCsv(filteredProductionReadiness(), [
+        { label: "Readiness ID", value: (item) => item.id },
+        { label: "Stage", value: (item) => item.stage },
+        { label: "Priority", value: (item) => item.priority },
+        { label: "Lane", value: (item) => item.lane },
+        { label: "Record ID", value: (item) => item.recordId },
+        { label: "Date", value: (item) => item.dateText },
+        { label: "Title", value: (item) => item.title },
+        { label: "Selection Status", value: (item) => item.selectionStatus },
+        { label: "Source Readiness", value: (item) => item.sourceReadiness },
+        { label: "Source-Note Readiness", value: (item) => item.sourceNoteReadiness },
+        { label: "Copy Status", value: (item) => item.copyStatus },
+        { label: "Annotation Load", value: (item) => item.annotationLoad },
+        { label: "Boundary Disposition", value: (item) => item.boundaryDisposition },
+        { label: "Next Action", value: (item) => item.nextAction },
+        { label: "Blocker", value: (item) => item.blocker },
+        { label: "Compiler Move", value: (item) => item.compilerMove },
+        { label: "Source Pattern", value: (item) => item.sourcePattern },
         { label: "Source Note", value: (item) => item.sourceNote },
         { label: "Source URL", value: (item) => item.catalogUrl },
         { label: "PDF URL", value: (item) => item.pdfUrl }
@@ -1680,11 +2046,13 @@ function init() {
   setStats();
   renderWorkbench();
   renderSelectionBoard();
+  renderProductionReadiness();
   renderChapterBriefs();
   renderGapTracker();
   renderSourcePools();
   renderRequestPackets();
   renderSourceNoteAudit();
+  renderSourceNotePatterns();
   renderSourceCopyLedger();
   renderChapters();
   populateFilters();

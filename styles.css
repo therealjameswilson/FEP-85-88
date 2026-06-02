@@ -460,6 +460,11 @@ dd {
   grid-template-columns: minmax(250px, 2fr) repeat(3, minmax(140px, 1fr)) auto auto;
 }
 
+.production-section .tools,
+.source-note-pattern-section .tools {
+  grid-template-columns: minmax(250px, 2fr) repeat(3, minmax(140px, 1fr)) auto auto;
+}
+
 .public-section .tools,
 .boundary-section .tools {
   grid-template-columns: minmax(250px, 2fr) minmax(160px, 1fr) auto auto;
@@ -796,6 +801,22 @@ summary {
   border-top-color: var(--green);
 }
 
+.source-note-pattern-card.status-copy-ready-pattern {
+  border-top-color: var(--green);
+}
+
+.source-note-pattern-card.status-target-only-pattern {
+  border-top-color: var(--gold);
+}
+
+.source-note-pattern-card.status-published-reference {
+  border-top-color: var(--blue);
+}
+
+.source-note-pattern-card.status-corroboration-only {
+  border-top-color: var(--plum);
+}
+
 .file-card.priority-boundary {
   border-top-color: var(--plum);
 }
@@ -841,6 +862,30 @@ summary {
 }
 
 .selection-card.status-boundary-exclude-unless-needed {
+  border-top: 4px solid var(--plum);
+}
+
+.production-card.stage-request-first {
+  border-top: 4px solid var(--rust);
+}
+
+.production-card.stage-attachment-check {
+  border-top: 4px solid var(--gold);
+}
+
+.production-card.stage-citation-review {
+  border-top: 4px solid var(--blue);
+}
+
+.production-card.stage-draft-package {
+  border-top: 4px solid var(--green);
+}
+
+.production-card.stage-context-anchor {
+  border-top: 4px solid var(--navy);
+}
+
+.production-card.stage-boundary-hold {
   border-top: 4px solid var(--plum);
 }
 
@@ -958,6 +1003,8 @@ footer {
   .tools,
   .policy-section .tools,
   .gap-section .tools,
+  .production-section .tools,
+  .source-note-pattern-section .tools,
   .source-pool-section .tools,
   .persons-tools,
   .public-section .tools,
@@ -1007,6 +1054,8 @@ footer {
   .tools,
   .policy-section .tools,
   .gap-section .tools,
+  .production-section .tools,
+  .source-note-pattern-section .tools,
   .source-pool-section .tools,
   .persons-tools,
   .public-section .tools,

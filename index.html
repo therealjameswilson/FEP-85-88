@@ -116,11 +116,14 @@
         <a href="#records">Chronology</a>
         <a href="#workbench">Desk</a>
         <a href="#selection-board">Selection</a>
+        <a href="#production-readiness">Readiness</a>
+        <a href="#annotation-queue">Annotations</a>
         <a href="#chapter-briefs">Briefs</a>
         <a href="#gap-tracker">Gaps</a>
         <a href="#source-pools">Source Pools</a>
         <a href="#request-packets">Requests</a>
         <a href="#source-note-qa">Source QA</a>
+        <a href="#source-note-patterns">Note Lab</a>
         <a href="#source-copy-ledger">Source Ledger</a>
         <a href="persons.html">Persons</a>
         <a href="#chapters">Lanes</a>
@@ -277,6 +280,68 @@
         </div>
       </section>
 
+      <section class="section production-section" id="production-readiness" aria-labelledby="production-title">
+        <div class="section-heading">
+          <p class="kicker">Production Readiness</p>
+          <h2 id="production-title">What Can Move, What Is Blocked</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter production readiness">
+          <label class="search-field">
+            <span>Search readiness</span>
+            <input id="production-search" type="search" placeholder="Search blockers, source status, annotation load, next action" />
+          </label>
+          <label>
+            <span>Stage</span>
+            <select id="production-stage-filter"></select>
+          </label>
+          <label>
+            <span>Lane</span>
+            <select id="production-lane-filter"></select>
+          </label>
+          <label>
+            <span>Priority</span>
+            <select id="production-priority-filter"></select>
+          </label>
+          <button id="clear-production-filters" type="button">Reset</button>
+          <button id="export-production" type="button">CSV</button>
+          <p id="production-summary" class="summary">Loading production readiness...</p>
+        </div>
+        <div id="production-root" class="records-root compact-records" aria-live="polite">
+          <p class="loading">Loading production readiness...</p>
+        </div>
+      </section>
+
+      <section class="section annotation-section" id="annotation-queue" aria-labelledby="annotation-title">
+        <div class="section-heading">
+          <p class="kicker">Annotation Queue</p>
+          <h2 id="annotation-title">First-Reference And Issue Notes</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter annotation queue">
+          <label class="search-field">
+            <span>Search annotations</span>
+            <input id="annotation-search" type="search" placeholder="Search issue, target, prompt, verification, boundary rule" />
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="annotation-status-filter"></select>
+          </label>
+          <label>
+            <span>Lane</span>
+            <select id="annotation-lane-filter"></select>
+          </label>
+          <label>
+            <span>Type</span>
+            <select id="annotation-type-filter"></select>
+          </label>
+          <button id="clear-annotation-filters" type="button">Reset</button>
+          <button id="export-annotations" type="button">CSV</button>
+          <p id="annotation-summary" class="summary">Loading annotation queue...</p>
+        </div>
+        <div id="annotation-root" class="file-grid" aria-live="polite">
+          <p class="loading">Loading annotation queue...</p>
+        </div>
+      </section>
+
       <section class="section chapter-brief-section" id="chapter-briefs" aria-labelledby="chapter-brief-title">
         <div class="section-heading">
           <p class="kicker">Chapter Briefs</p>
@@ -413,6 +478,37 @@
         </div>
         <div id="source-note-root" class="file-grid" aria-live="polite">
           <p class="loading">Loading source-note audit...</p>
+        </div>
+      </section>
+
+      <section class="section source-note-pattern-section" id="source-note-patterns" aria-labelledby="source-note-pattern-title">
+        <div class="section-heading">
+          <p class="kicker">Source-Note Pattern Lab</p>
+          <h2 id="source-note-pattern-title">FRUS-Style Citation Templates</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter source-note patterns">
+          <label class="search-field">
+            <span>Search patterns</span>
+            <input id="source-note-pattern-search" type="search" placeholder="Search repository, template, precedent, rejection rules" />
+          </label>
+          <label>
+            <span>Repository</span>
+            <select id="source-note-pattern-repository-filter"></select>
+          </label>
+          <label>
+            <span>Lane</span>
+            <select id="source-note-pattern-lane-filter"></select>
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="source-note-pattern-status-filter"></select>
+          </label>
+          <button id="clear-source-note-pattern-filters" type="button">Reset</button>
+          <button id="export-source-note-patterns" type="button">CSV</button>
+          <p id="source-note-pattern-summary" class="summary">Loading source-note patterns...</p>
+        </div>
+        <div id="source-note-pattern-root" class="file-grid" aria-live="polite">
+          <p class="loading">Loading source-note patterns...</p>
         </div>
       </section>
 
