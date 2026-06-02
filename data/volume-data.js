@@ -4,6 +4,11 @@ const NSDD_INDEX_URL = "https://www.reaganlibrary.gov/reagans/reagan-administrat
 const PUBLIC_PAPERS_URL = "https://www.reaganlibrary.gov/archives/public-papers-president-ronald-reagan";
 const FRUS_1977_80_V03_SOURCES_URL = "https://history.state.gov/historicaldocuments/frus1977-80v03/sources";
 const FRUS_1981_88_V38_SOURCES_URL = "https://history.state.gov/historicaldocuments/frus1981-88v38/sources";
+const FRUS_1977_80_V03_D258_URL = "https://history.state.gov/historicaldocuments/frus1977-80v03/d258fn1";
+const FRUS_1977_80_V03_D192_URL = "https://history.state.gov/historicaldocuments/frus1977-80v03/d192fn3";
+const FRUS_1981_88_V38_D169_URL = "https://history.state.gov/historicaldocuments/frus1981-88v38/d169";
+const FRUS_1981_88_V38_D355_URL = "https://history.state.gov/historicaldocuments/frus1981-88v38/d355";
+const FRUS_1981_88_V38_D221_URL = "https://history.state.gov/historicaldocuments/frus1981-88v38/d221fn3";
 const REAGAN_TRADE_TOPIC_GUIDE_URL = "https://www.reaganlibrary.gov/archives/topic-guide/trade";
 const DANZANSKY_TRADE_FOIA_URL = "https://www.reaganlibrary.gov/public/foia/f06-054-1.pdf";
 const DANZANSKY_GRAIN_LTA_URL = "https://www.reaganlibrary.gov/public/digitallibrary/smof/nsc-internationaleconomicaffairs/danzansky/r12/40-733-R12-038-2019.pdf";
@@ -1722,6 +1727,193 @@ window.CHAPTER_BRIEFS = [
     ],
     firstDraftMove: "Use boundary rows before adding any attractive but adjacent record to the chronology.",
     unresolvedRisk: "Boundary drift is the main risk as source harvesting expands."
+  }
+];
+
+window.SOURCE_NOTE_PATTERNS = [
+  {
+    id: "SNP-001",
+    status: "Copy-ready pattern",
+    repository: "Reagan Library",
+    lane: lanes.trade.name,
+    patternType: "Stephen Danzansky staff file",
+    precedent: "FRUS 1981-1988, Volume XXXVIII uses Danzansky file path, NLR number, classification, and meeting/drafting facts.",
+    precedentUrl: FRUS_1981_88_V38_D355_URL,
+    sourceBase: "Reagan Library Danzansky finding aid and trade topic guide.",
+    sourceBaseUrl: REAGAN_TRADE_TOPIC_GUIDE_URL,
+    template: "Source: Reagan Library, Stephen Danzansky Files, [series or outline], [folder title]; [NLR number]. [Classification]. [Drafting, meeting, routing, or copy note].",
+    volume37Use: "Use for EPC minutes, International Trade Subject Outline folders, Danzansky chronological files, and trade-control coordination papers once the exact folder/NLR line is verified.",
+    readyWhen: [
+      "Series or outline title is copied from the finding aid or folder title.",
+      "NLR number or box/folder control is confirmed from the document image.",
+      "Classification line and routing/drafting details are taken from the document, not inferred."
+    ],
+    rejectIf: [
+      "The note says only RAC Box, accession, or generic Danzansky Files without the file path.",
+      "The classification is absent from a Reagan Library manuscript source.",
+      "The note hides whether a meeting minute, action memorandum, or information memorandum was selected."
+    ]
+  },
+  {
+    id: "SNP-002",
+    status: "Copy-ready pattern",
+    repository: "Reagan Library",
+    lane: lanes.summits.name,
+    patternType: "Economic summit file",
+    precedent: "Volume XXXVIII summit notes cite Danzansky Summit File folders with trip dates, NLR control, classification, and meeting context.",
+    precedentUrl: FRUS_1981_88_V38_D221_URL,
+    sourceBase: "Reagan Library economic summit source pools and Volume XXXVIII source list.",
+    sourceBaseUrl: FRUS_1981_88_V38_SOURCES_URL,
+    template: "Source: Reagan Library, [collection], [summit file or staff series], [folder title with summit/date span]; [NLR or box-folder control]. [Classification]. [Meeting session, drafting, or attachment note].",
+    volume37Use: "Use for Tokyo, Venice, and Toronto summit preparation files, White House Summit Group records, and sherpa-level meeting notes.",
+    readyWhen: [
+      "The summit, date span, and session are clear enough to distinguish preparation, meeting minutes, and public-declaration drafts.",
+      "The selected document is economic/summit coordination rather than ceremonial trip material.",
+      "Attachment status is checked before final publication."
+    ],
+    rejectIf: [
+      "The note cites only the public summit declaration.",
+      "The folder title lacks the summit name or date span.",
+      "Political or arms-control summit material is being pulled into this volume without an economic-policy reason."
+    ]
+  },
+  {
+    id: "SNP-003",
+    status: "Target-only pattern",
+    repository: "Reagan Library",
+    lane: lanes.controls.name,
+    patternType: "NSDD reference copy and attachments",
+    precedent: "The Reagan Library NSDD page identifies the NSDD institutional records and notes that open or partially open directives are digitized.",
+    precedentUrl: NSDD_INDEX_URL,
+    sourceBase: "Reagan Library NSDD digitized reference copies.",
+    sourceBaseUrl: NSDD_INDEX_URL,
+    template: "Source-note target: Reagan Library, Executive Secretariat, NSC: National Security Decision Directives (NSDD): Records, [NSDD number and title]. [Final directive classification]. [Attachment/background status].",
+    volume37Use: "Use for NSDD 154, 198, 226, 241, 297, and 320 until the signed directive, attachments, and background papers are separated.",
+    readyWhen: [
+      "Signed directive date, title, and classification are verified from the scanned image.",
+      "Attachments/background papers are checked in the Executive Secretariat collection inventory.",
+      "A separate row is made for any selected attachment rather than folding it into the directive note."
+    ],
+    rejectIf: [
+      "The public reference copy is treated as proof that all attachments are open.",
+      "The note omits whether the item is the signed directive or an attachment.",
+      "A directive about security or arms control is selected without explaining the trade-control connection."
+    ]
+  },
+  {
+    id: "SNP-004",
+    status: "Copy-ready pattern",
+    repository: "National Archives",
+    lane: lanes.monetary.name,
+    patternType: "RG 56 Treasury files",
+    precedent: "Carter Volume III and Reagan Volume XXXVIII both place RG 56, Treasury office/series, accession, box, folder, classification, and routing in the note.",
+    precedentUrl: FRUS_1981_88_V38_D169_URL,
+    sourceBase: "FRUS 1977-1980 Volume III source list for Treasury and RG 56.",
+    sourceBaseUrl: FRUS_1977_80_V03_SOURCES_URL,
+    template: "Source: National Archives, RG 56, Records of the Department of the Treasury, [office/series], [accession], Box [box], [folder]. [Classification]. [Routing, action, or copy note].",
+    volume37Use: "Use for Plaza/Louvre follow-through, G-5/G-7 finance minister coordination, Mulford/Brady/Regan files, and Treasury International Affairs records.",
+    readyWhen: [
+      "The exact Treasury office, accession, box, and folder are known.",
+      "The selected item is Treasury/Fed foreign economic diplomacy rather than domestic fiscal policy.",
+      "Routing through Sprinkel, Baker, Regan, Brady, Volcker, or Greenspan is recorded when visible."
+    ],
+    rejectIf: [
+      "The note says only RG 56 or Treasury International Affairs without accession and folder data.",
+      "Summit declaration language is used in place of Treasury records.",
+      "Debt-rescheduling material belongs in Volume XXXVIII and is not tied to exchange-rate or summit macroeconomic policy."
+    ]
+  },
+  {
+    id: "SNP-005",
+    status: "Copy-ready pattern",
+    repository: "National Archives",
+    lane: lanes.trade.name,
+    patternType: "RG 364 USTR/STR files",
+    precedent: "Volume III RG 364 notes use record group, accession/series, Subject Files, date span, box, folder, then classification.",
+    precedentUrl: FRUS_1977_80_V03_D192_URL,
+    sourceBase: "FRUS 1977-1980 Volume III source list identifies RG 364 trade representative subject files.",
+    sourceBaseUrl: FRUS_1977_80_V03_SOURCES_URL,
+    template: "Source: National Archives, RG 364, Records of the Office of the United States Trade Representative, [accession or series], [subseries], Box [box], [folder]. [Classification]. [Drafting, attachment, or signature note].",
+    volume37Use: "Use for Canada FTA, GATT/Uruguay Round, Japan market access, agriculture, Super 301, and Omnibus Trade Act negotiation strategy.",
+    readyWhen: [
+      "USTR accession/series and box/folder are confirmed by NARA pull data.",
+      "The record is negotiation/interagency strategy rather than public messaging alone.",
+      "Any attached tabs are accounted for as printed, omitted, or not found."
+    ],
+    rejectIf: [
+      "The note keeps bracket placeholders after a document is selected.",
+      "A domestic trade-legislation item lacks foreign-policy relevance.",
+      "The source line uses a USTR shorthand not found in the archival path."
+    ]
+  },
+  {
+    id: "SNP-006",
+    status: "Target-only pattern",
+    repository: "National Archives",
+    lane: lanes.summits.name,
+    patternType: "RG 59 central and lot files",
+    precedent: "Volume III identifies RG 59 Central Foreign Policy File and State lot files as distinct source-note lanes.",
+    precedentUrl: FRUS_1977_80_V03_SOURCES_URL,
+    sourceBase: "FRUS 1977-1980 Volume III source list for RG 59 Central Foreign Policy File and lot files.",
+    sourceBaseUrl: FRUS_1977_80_V03_SOURCES_URL,
+    template: "Source-note target: National Archives, RG 59, [Central Foreign Policy File, document number OR office/lot file title], [lot/accession if applicable], Box [box], [folder]. [Classification].",
+    volume37Use: "Use for summit preparatory cables, State economic reporting, EB/E summit files, and allied positions on trade, exchange rates, and summit declarations.",
+    readyWhen: [
+      "The row distinguishes CFPF document numbers from lot-file office records.",
+      "Cable traffic has date, origin, subject, and document number.",
+      "Lot files have office, lot/accession, box, and folder before publication."
+    ],
+    rejectIf: [
+      "CFPF and lot-file formats are blended in one note.",
+      "The note omits document number for a cable.",
+      "Regional political traffic is retained without an economic-policy selection rationale."
+    ]
+  },
+  {
+    id: "SNP-007",
+    status: "Published reference",
+    repository: "Published",
+    lane: lanes.boundary.name,
+    patternType: "Public Papers endpoint",
+    precedent: "Volume XXXVIII uses Public Papers as printed/public endpoint citations, not as substitutes for internal decision records.",
+    precedentUrl: FRUS_1981_88_V38_D169_URL,
+    sourceBase: "Reagan Library Public Papers and FRUS public-source precedent.",
+    sourceBaseUrl: PUBLIC_PAPERS_URL,
+    template: "For public endpoint notes: Public Papers: Reagan, [year], Book [I/II], pp. [pages]. Use with a separate archival source note when the internal decision record is selected.",
+    volume37Use: "Use for public speeches, declarations, summit statements, and trade-policy announcements after selecting or annotating the private decision record.",
+    readyWhen: [
+      "The citation has year, book, and page range.",
+      "The public text is used as endpoint or annotation evidence.",
+      "A private source is still pursued for decision-making documents."
+    ],
+    rejectIf: [
+      "The Public Papers note replaces Danzansky, Treasury, State, or USTR evidence.",
+      "The page range is missing.",
+      "The public item is only atmospherics and not tied to a selected internal record."
+    ]
+  },
+  {
+    id: "SNP-008",
+    status: "Corroboration only",
+    repository: "Reagan Library",
+    lane: lanes.boundary.name,
+    patternType: "President's Daily Diary",
+    precedent: "Volume III lists presidential daily diary material as a source base, while document notes use it mainly when no meeting memorandum is found.",
+    precedentUrl: FRUS_1977_80_V03_SOURCES_URL,
+    sourceBase: "Reagan Library Daily Diary research lane.",
+    sourceBaseUrl: "https://www.reaganlibrary.gov/archives/daily-diary",
+    template: "Cross-reference target: Reagan Library, President Reagan's Daily Diary, [date]. Use for time, place, attendees, and call/meeting corroboration unless the diary itself is selected.",
+    volume37Use: "Use to corroborate Baker, Regan, Shultz, Volcker, Greenspan, Mulroney, Nakasone, Mitterrand, Kohl, Thatcher, and G-7 leader contacts.",
+    readyWhen: [
+      "The diary confirms the meeting or call but does not replace substantive minutes.",
+      "The chronology row records time, location, and participants separately from the source note.",
+      "No-memorandum cases are flagged in the source-copy ledger."
+    ],
+    rejectIf: [
+      "The diary is used as the source for substantive policy discussion when a memorandum is available.",
+      "A schedule entry is selected without checking State, Treasury, NSC, or USTR files.",
+      "The diary note is made copy-ready before the date image or transcript is verified."
+    ]
   }
 ];
 
