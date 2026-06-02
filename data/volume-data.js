@@ -1573,6 +1573,158 @@ window.SELECTION_BOARD = [
   }
 ];
 
+window.CHAPTER_BRIEFS = [
+  {
+    lane: lanes.trade.name,
+    urgency: "Critical",
+    workingTitle: "Trade Policy and Market Access",
+    thesis: "The trade chapter should show the Reagan administration moving from bilateral market-opening directives and public free-trade rhetoric toward harder interagency choices on Canada FTA, Japan market access, GATT/Uruguay Round, agriculture, and trade legislation.",
+    documentSpine: [
+      "NSDD 154 for Japan market-access baseline.",
+      "Danzansky Box 90973 EPC minutes and meeting papers for private trade-policy decisions.",
+      "USTR RG 364 files for Canada FTA, GATT/Uruguay Round, Japan, agriculture, and Omnibus Trade Act.",
+      "Public Papers only as endpoints or speech-clearance crosswalks."
+    ],
+    mustHarvest: [
+      "Danzansky International Trade IX EPC folders.",
+      "NARA RG 364 USTR accession/series data.",
+      "WHORM Trade routing on Canada FTA, Japan, Super 301, agriculture, and Omnibus Trade Act.",
+      "Speechwriting and agency-clearance files for major trade speeches."
+    ],
+    annotationQuestions: [
+      "What changed between internal trade strategy and the public free/fair trade line?",
+      "Which bilateral disputes belong here instead of regional volumes?",
+      "Where do agriculture and food-aid records cross into Volume XXXVIII?"
+    ],
+    exclusionRules: [
+      "Exclude domestic-only competitiveness and tax policy unless it directly shaped trade diplomacy.",
+      "Route Japan political/security records to regional volumes unless market access or controls are central.",
+      "Do not let public speeches substitute for USTR negotiation records."
+    ],
+    firstDraftMove: "Draft a trade chronology around NSDD 154, Canada FTA public endpoints, Danzansky EPC minutes, and RG 364 request-first leads.",
+    unresolvedRisk: "The chapter remains too public-facing until RG 364 and Danzansky EPC files are harvested."
+  },
+  {
+    lane: lanes.monetary.name,
+    urgency: "Critical",
+    workingTitle: "Monetary Policy and Exchange Rates",
+    thesis: "The monetary chapter must be built around Treasury/Federal Reserve and G-5/G-7 finance-minister evidence, with summit files serving as bridges rather than the core record.",
+    documentSpine: [
+      "RG 56 Treasury International Affairs records for Plaza/Louvre follow-through.",
+      "Sprinkel OA 17743 Toronto folder as a White House bridge to foreign exchange reporting.",
+      "State RG 59 economic cables and lot files for summit reporting and allied positions.",
+      "Daily Diary controls for Baker, Regan, Brady, Volcker, and Greenspan contacts."
+    ],
+    mustHarvest: [
+      "NARA RG 56 exact series, boxes, and folders for Plaza/Louvre and G-5/G-7 finance ministers.",
+      "Federal Reserve channel for Volcker/Greenspan contacts.",
+      "State economic reporting on exchange-rate coordination.",
+      "Donald Regan and Baker-related White House files for high-level coordination."
+    ],
+    annotationQuestions: [
+      "How did the administration frame dollar stability after Plaza and Louvre?",
+      "Which decisions were made through finance-minister channels rather than summit channels?",
+      "Where do debt-relief discussions belong in Volume XXXVIII instead?"
+    ],
+    exclusionRules: [
+      "Exclude domestic budget/fiscal policy unless it directly shaped foreign economic diplomacy.",
+      "Do not use summit declarations as substitutes for Treasury/Fed records.",
+      "Route debt-management records to Volume XXXVIII unless they drive exchange-rate or summit macroeconomic decisions."
+    ],
+    firstDraftMove: "Do not draft final selection until RG 56 and Fed leads are converted from targets to document-level rows.",
+    unresolvedRisk: "This is the thinnest chapter until Treasury/Fed records are located."
+  },
+  {
+    lane: lanes.summits.name,
+    urgency: "High",
+    workingTitle: "Industrialized Country Cooperation",
+    thesis: "The summit chapter should connect NSDD preparation directives, White House Summit Group work, State/Treasury sherpa channels, and public declarations for Tokyo, Venice, and Toronto.",
+    documentSpine: [
+      "NSDD 198, NSDD 241, and NSDD 297 as formal preparation anchors.",
+      "Howard Baker Box 5 Toronto folder for White House Summit Group decision work.",
+      "Beryl Sprinkel OA 17743 and State/Treasury files for economic and monetary agenda.",
+      "Public Papers declarations and press conferences as endpoints."
+    ],
+    mustHarvest: [
+      "Danzansky summit preparation folders for Tokyo, Venice, and Toronto.",
+      "Baker and Powell Toronto attachments, exact pages, and withdrawal context.",
+      "State RG 59 reporting from summit preparatory meetings.",
+      "Daily Diary controls for bilateral meetings and briefing sessions."
+    ],
+    annotationQuestions: [
+      "Which summit issues were private U.S. priorities and which were public declaration language?",
+      "How did trade and exchange-rate objectives travel through summit preparation?",
+      "Which debt or assistance discussions should be handed off to Volume XXXVIII?"
+    ],
+    exclusionRules: [
+      "Exclude purely ceremonial summit records.",
+      "Route arms-control/political summit material to other volumes unless it shapes the economic agenda.",
+      "Use Public Papers as endpoints, not the core."
+    ],
+    firstDraftMove: "Assemble a summit-by-summit spine: NSDD directive, internal prep document, public declaration, boundary notes.",
+    unresolvedRisk: "Toronto is much stronger than Tokyo/Venice until more Danzansky and State preparation files are found."
+  },
+  {
+    lane: lanes.controls.name,
+    urgency: "High",
+    workingTitle: "Strategic Trade Controls and Technology Transfer",
+    thesis: "The controls chapter should treat export controls and technology transfer as foreign economic policy when they involve allied coordination, market access, COCOM, machine tools, or strategic trade-control directives.",
+    documentSpine: [
+      "NSDD 226 for machine tools and national security.",
+      "NSDD 320 for late-Reagan strategic trade-control policy.",
+      "COCOM, Toshiba-Kongsberg, Commerce, Defense, and State implementation files.",
+      "Danzansky files as White House coordination leads."
+    ],
+    mustHarvest: [
+      "NSDD 226 and 320 attachments/background papers.",
+      "Commerce/Defense/State implementation records.",
+      "COCOM and Toshiba-Kongsberg files.",
+      "Allied coordination records with Japan and Western Europe."
+    ],
+    annotationQuestions: [
+      "When is a technology-control record foreign economic policy rather than defense policy?",
+      "How did allied coordination affect U.S. trade-control choices?",
+      "Which machine-tool or Toshiba-Kongsberg materials belong in regional/national-security volumes?"
+    ],
+    exclusionRules: [
+      "Exclude arms-control-only technology-transfer files.",
+      "Exclude defense procurement records unless they shape trade-control diplomacy.",
+      "Route Japan alliance-management records away unless the trade-control issue is central."
+    ],
+    firstDraftMove: "Use NSDD 226 and NSDD 320 as bookends, then fill implementation with Commerce/Defense/State/COCOM files.",
+    unresolvedRisk: "Signed directives are strong anchors, but implementation records still need harvesting."
+  },
+  {
+    lane: lanes.boundary.name,
+    urgency: "High",
+    workingTitle: "Boundary and Adjacent Economic Files",
+    thesis: "The boundary chapter is not a narrative chapter; it is the guardrail that keeps debt, aid, regional politics, domestic economics, and national-security technology records from crowding Volume XXXVII.",
+    documentSpine: [
+      "FRUS Volume XXXVI for 1981-1984 carry-forward limits.",
+      "FRUS Volume XXXVIII for development, assistance, and international debt handoffs.",
+      "Regional volume routing rules for Japan, Western Europe, Canada, and Soviet commercial relations.",
+      "Selection Board boundary/exclusion calls."
+    ],
+    mustHarvest: [
+      "Exact adjacent-volume source lists when a candidate record overlaps.",
+      "Short handoff notes for excluded debt, aid, regional, or domestic-only files.",
+      "Persons authority review for actors who appear only in boundary material."
+    ],
+    annotationQuestions: [
+      "Does the candidate drive trade, monetary, summit, or strategic-control policy?",
+      "Would another Reagan FRUS volume be the natural home?",
+      "Is the record needed as context or as selected documentation?"
+    ],
+    exclusionRules: [
+      "Exclude debt and assistance unless they directly drive summit/macroeconomic decisions.",
+      "Exclude domestic economic policy unless it shapes foreign economic diplomacy.",
+      "Exclude regional politics unless trade, monetary, summit, or controls are central."
+    ],
+    firstDraftMove: "Use boundary rows before adding any attractive but adjacent record to the chronology.",
+    unresolvedRisk: "Boundary drift is the main risk as source harvesting expands."
+  }
+];
+
 window.SOURCE_COPY_LEDGER = [
   {
     issueType: "Digitized reference copy",

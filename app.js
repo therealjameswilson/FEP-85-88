@@ -8,6 +8,7 @@ const gapTracker = window.GAP_TRACKER || [];
 const sourcePools = window.SOURCE_POOLS || [];
 const requestPackets = window.REQUEST_PACKETS || [];
 const selectionBoard = window.SELECTION_BOARD || [];
+const chapterBriefs = window.CHAPTER_BRIEFS || [];
 const sourceCopyLedger = window.SOURCE_COPY_LEDGER || [];
 const chapters = meta.chapters || [];
 const sourceNoteAudit = buildSourceNoteAudit();
@@ -37,6 +38,11 @@ const state = {
     query: "",
     status: "",
     lane: ""
+  },
+  chapterBriefs: {
+    query: "",
+    lane: "",
+    urgency: ""
   },
   gaps: {
     query: "",
@@ -103,6 +109,13 @@ const nodes = {
   selectionLaneFilter: document.querySelector("#selection-lane-filter"),
   clearSelectionFilters: document.querySelector("#clear-selection-filters"),
   exportSelections: document.querySelector("#export-selections"),
+  chapterBriefRoot: document.querySelector("#chapter-brief-root"),
+  chapterBriefSummary: document.querySelector("#chapter-brief-summary"),
+  chapterBriefSearch: document.querySelector("#chapter-brief-search"),
+  chapterBriefLaneFilter: document.querySelector("#chapter-brief-lane-filter"),
+  chapterBriefUrgencyFilter: document.querySelector("#chapter-brief-urgency-filter"),
+  clearChapterBriefFilters: document.querySelector("#clear-chapter-brief-filters"),
+  exportChapterBriefs: document.querySelector("#export-chapter-briefs"),
   gapRoot: document.querySelector("#gap-root"),
   gapSummary: document.querySelector("#gap-summary"),
   gapSearch: document.querySelector("#gap-search"),
@@ -217,6 +230,15 @@ function searchText(item) {
     item.boundaryRisk,
     item.annotationLead,
     item.sourceLead,
+    item.workingTitle,
+    item.thesis,
+    item.documentSpine?.join(" "),
+    item.mustHarvest?.join(" "),
+    item.annotationQuestions?.join(" "),
+    item.exclusionRules?.join(" "),
+    item.firstDraftMove,
+    item.unresolvedRisk,
+    item.urgency,
     item.sourceTitle,
     item.sourceNote,
     item.section,
@@ -735,6 +757,109 @@ function selectionMemo(item) {
   ].join("\n");
 }
 
+function filteredChapterBriefs() {
+  return chapterBriefs.filter((brief) => {
+    if (!matchesQuery(brief, state.chapterBriefs.query)) return false;
+    if (state.chapterBriefs.lane && brief.lane !== state.chapterBriefs.lane) return false;
+    if (state.chapterBriefs.urgency && brief.urgency !== state.chapterBriefs.urgency) return false;
+    return true;
+  });
+}
+
+function renderChapterBriefs() {
+  const urgencyOrder = new Map([
+    ["Critical", 1],
+    ["High", 2],
+    ["Medium", 3],
+    ["Low", 4]
+  ]);
+  const visible = filteredChapterBriefs().sort(
+    (a, b) =>
+      (urgencyOrder.get(a.urgency) || 99) - (urgencyOrder.get(b.urgency) || 99) ||
+      a.lane.localeCompare(b.lane)
+  );
+  nodes.chapterBriefSummary.textContent = `${plural(visible.length, "chapter brief")} visible from ${chapterBriefs.length} lane assembly notes.`;
+  nodes.chapterBriefRoot.replaceChildren(...visible.map(chapterBriefCard));
+  if (!visible.length) nodes.chapterBriefRoot.innerHTML = '<p class="empty">No chapter briefs match the current filters.</p>';
+}
+
+function chapterBriefCard(brief) {
+  const card = document.createElement("article");
+  card.className = `file-card chapter-brief-card priority-${brief.urgency.toLowerCase()}`;
+
+  const header = document.createElement("header");
+  const titleBlock = document.createElement("div");
+  const meta = document.createElement("div");
+  meta.className = "file-meta";
+  meta.append(textSpan(brief.urgency), textSpan(brief.lane));
+  const title = document.createElement("h3");
+  title.textContent = brief.workingTitle;
+  titleBlock.append(meta, title);
+  header.append(titleBlock);
+
+  const thesis = document.createElement("p");
+  thesis.textContent = brief.thesis;
+
+  const spine = briefList("Document spine", brief.documentSpine);
+  const harvest = briefList("Must harvest", brief.mustHarvest);
+  const questions = briefList("Annotation questions", brief.annotationQuestions);
+  const exclusions = briefList("Exclusion rules", brief.exclusionRules);
+
+  const firstMove = document.createElement("p");
+  firstMove.className = "source-note";
+  firstMove.textContent = `First draft move: ${brief.firstDraftMove}`;
+  const risk = document.createElement("p");
+  risk.className = "source-note";
+  risk.textContent = `Unresolved risk: ${brief.unresolvedRisk}`;
+
+  const actions = document.createElement("div");
+  actions.className = "file-actions";
+  actions.append(copyButton(chapterBriefMemo(brief), "Copy chapter brief"));
+
+  card.append(header, chip(brief.urgency, brief.urgency === "Critical" ? "warn" : "boundary"), thesis, spine, harvest, questions, exclusions, firstMove, risk, actions);
+  return card;
+}
+
+function briefList(label, values) {
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  summary.textContent = label;
+  const list = document.createElement("ul");
+  list.className = "compact-list";
+  for (const value of values || []) {
+    const item = document.createElement("li");
+    item.textContent = value;
+    list.append(item);
+  }
+  details.append(summary, list);
+  return details;
+}
+
+function chapterBriefMemo(brief) {
+  return [
+    `${brief.workingTitle}`,
+    `Lane: ${brief.lane}`,
+    `Urgency: ${brief.urgency}`,
+    "",
+    `Thesis: ${brief.thesis}`,
+    "",
+    "Document spine:",
+    ...(brief.documentSpine || []).map((item) => `- ${item}`),
+    "",
+    "Must harvest:",
+    ...(brief.mustHarvest || []).map((item) => `- ${item}`),
+    "",
+    "Annotation questions:",
+    ...(brief.annotationQuestions || []).map((item) => `- ${item}`),
+    "",
+    "Exclusion rules:",
+    ...(brief.exclusionRules || []).map((item) => `- ${item}`),
+    "",
+    `First draft move: ${brief.firstDraftMove}`,
+    `Unresolved risk: ${brief.unresolvedRisk}`
+  ].join("\n");
+}
+
 function renderSourceCopyLedger() {
   const markerCount = sourceCopyLedger.filter((item) => item.issueType === "Marker / no memorandum").length;
   const partialCount = sourceCopyLedger.length - markerCount;
@@ -823,6 +948,8 @@ function populateFilters() {
   addOptions(nodes.boundaryCountryFilter, uniqueSorted(boundaryRecords.map((record) => record.country)), "All countries");
   addOptions(nodes.selectionStatusFilter, uniqueSorted(selectionBoard.map((item) => item.status)), "All statuses");
   addOptions(nodes.selectionLaneFilter, uniqueSorted(selectionBoard.map((item) => item.lane)), "All lanes");
+  addOptions(nodes.chapterBriefLaneFilter, uniqueSorted(chapterBriefs.map((brief) => brief.lane)), "All lanes");
+  addOptions(nodes.chapterBriefUrgencyFilter, uniqueSorted(chapterBriefs.map((brief) => brief.urgency)), "All urgencies");
   addOptions(nodes.gapLaneFilter, uniqueSorted(gapTracker.map((gap) => gap.lane)), "All lanes");
   addOptions(nodes.gapPriorityFilter, uniqueSorted(gapTracker.map((gap) => gap.priority)), "All priorities");
   addOptions(nodes.gapStatusFilter, uniqueSorted(gapTracker.map((gap) => gap.status)), "All statuses");
@@ -1380,6 +1507,43 @@ function setupEvents() {
     );
   });
 
+  nodes.chapterBriefSearch.addEventListener("input", (event) => {
+    state.chapterBriefs.query = event.target.value;
+    renderChapterBriefs();
+  });
+  nodes.chapterBriefLaneFilter.addEventListener("change", (event) => {
+    state.chapterBriefs.lane = event.target.value;
+    renderChapterBriefs();
+  });
+  nodes.chapterBriefUrgencyFilter.addEventListener("change", (event) => {
+    state.chapterBriefs.urgency = event.target.value;
+    renderChapterBriefs();
+  });
+  nodes.clearChapterBriefFilters.addEventListener("click", () => {
+    state.chapterBriefs = { query: "", lane: "", urgency: "" };
+    nodes.chapterBriefSearch.value = "";
+    nodes.chapterBriefLaneFilter.value = "";
+    nodes.chapterBriefUrgencyFilter.value = "";
+    renderChapterBriefs();
+  });
+  nodes.exportChapterBriefs.addEventListener("click", () => {
+    downloadCsv(
+      "frus-volume37-chapter-briefs.csv",
+      toCsv(filteredChapterBriefs(), [
+        { label: "Urgency", value: (brief) => brief.urgency },
+        { label: "Lane", value: (brief) => brief.lane },
+        { label: "Working Title", value: (brief) => brief.workingTitle },
+        { label: "Thesis", value: (brief) => brief.thesis },
+        { label: "Document Spine", value: (brief) => (brief.documentSpine || []).join("; ") },
+        { label: "Must Harvest", value: (brief) => (brief.mustHarvest || []).join("; ") },
+        { label: "Annotation Questions", value: (brief) => (brief.annotationQuestions || []).join("; ") },
+        { label: "Exclusion Rules", value: (brief) => (brief.exclusionRules || []).join("; ") },
+        { label: "First Draft Move", value: (brief) => brief.firstDraftMove },
+        { label: "Unresolved Risk", value: (brief) => brief.unresolvedRisk }
+      ])
+    );
+  });
+
   nodes.recordSearch.addEventListener("input", (event) => {
     state.records.query = event.target.value;
     renderRecords();
@@ -1516,6 +1680,7 @@ function init() {
   setStats();
   renderWorkbench();
   renderSelectionBoard();
+  renderChapterBriefs();
   renderGapTracker();
   renderSourcePools();
   renderRequestPackets();
