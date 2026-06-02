@@ -11,6 +11,7 @@ const selectionBoard = window.SELECTION_BOARD || [];
 const chapterBriefs = window.CHAPTER_BRIEFS || [];
 const sourceNotePatterns = window.SOURCE_NOTE_PATTERNS || [];
 const productionReadiness = window.PRODUCTION_READINESS || [];
+const annotationQueue = window.ANNOTATION_QUEUE || [];
 const sourceCopyLedger = window.SOURCE_COPY_LEDGER || [];
 const chapters = meta.chapters || [];
 const sourceNoteAudit = buildSourceNoteAudit();
@@ -47,6 +48,12 @@ const state = {
     lane: "",
     priority: ""
   },
+  annotations: {
+    query: "",
+    status: "",
+    lane: "",
+    type: ""
+  },
   chapterBriefs: {
     query: "",
     lane: "",
@@ -78,6 +85,12 @@ const state = {
     repository: "",
     lane: "",
     status: ""
+  },
+  ledger: {
+    query: "",
+    issue: "",
+    lane: "",
+    priority: ""
   }
 };
 
@@ -131,6 +144,14 @@ const nodes = {
   productionPriorityFilter: document.querySelector("#production-priority-filter"),
   clearProductionFilters: document.querySelector("#clear-production-filters"),
   exportProduction: document.querySelector("#export-production"),
+  annotationRoot: document.querySelector("#annotation-root"),
+  annotationSummary: document.querySelector("#annotation-summary"),
+  annotationSearch: document.querySelector("#annotation-search"),
+  annotationStatusFilter: document.querySelector("#annotation-status-filter"),
+  annotationLaneFilter: document.querySelector("#annotation-lane-filter"),
+  annotationTypeFilter: document.querySelector("#annotation-type-filter"),
+  clearAnnotationFilters: document.querySelector("#clear-annotation-filters"),
+  exportAnnotations: document.querySelector("#export-annotations"),
   chapterBriefRoot: document.querySelector("#chapter-brief-root"),
   chapterBriefSummary: document.querySelector("#chapter-brief-summary"),
   chapterBriefSearch: document.querySelector("#chapter-brief-search"),
@@ -176,7 +197,13 @@ const nodes = {
   clearSourceNotePatternFilters: document.querySelector("#clear-source-note-pattern-filters"),
   exportSourceNotePatterns: document.querySelector("#export-source-note-patterns"),
   ledgerRoot: document.querySelector("#ledger-root"),
-  ledgerSummary: document.querySelector("#ledger-summary")
+  ledgerSummary: document.querySelector("#ledger-summary"),
+  ledgerSearch: document.querySelector("#ledger-search"),
+  ledgerIssueFilter: document.querySelector("#ledger-issue-filter"),
+  ledgerLaneFilter: document.querySelector("#ledger-lane-filter"),
+  ledgerPriorityFilter: document.querySelector("#ledger-priority-filter"),
+  clearLedgerFilters: document.querySelector("#clear-ledger-filters"),
+  exportLedger: document.querySelector("#export-ledger")
 };
 
 function assignCompilerNumbers(items) {
@@ -233,7 +260,9 @@ function searchText(item) {
     item.counterpart,
     item.naid,
     item.type,
+    item.issueType,
     item.releaseStatus,
+    item.catalogLabel,
     item.frusSourceNote,
     item.sourceNote,
     item.diaryCrossReferenceNote,
@@ -245,6 +274,7 @@ function searchText(item) {
     item.problem,
     item.evidence,
     item.needed,
+    item.action,
     item.coverage,
     item.nextUse,
     item.repository,
@@ -270,6 +300,16 @@ function searchText(item) {
     item.blocker,
     item.compilerMove,
     item.sourcePattern,
+    item.targetType,
+    item.target,
+    item.linkedRecords?.join(" "),
+    item.firstUse,
+    item.annotationQuestion,
+    item.draftPrompt,
+    item.verificationNeeded,
+    item.sourceHook,
+    item.boundaryRule,
+    item.exportNote,
     item.workingTitle,
     item.thesis,
     item.documentSpine?.join(" "),
@@ -404,6 +444,7 @@ function renderWorkbench() {
   const draftSelections = selectionBoard.filter((item) => item.status === "Draft candidate");
   const requestFirstRows = productionReadiness.filter((item) => item.stage === "Request first");
   const draftReadyRows = productionReadiness.filter((item) => item.stage === "Draft package");
+  const blockedAnnotations = annotationQueue.filter((item) => /blocked|verify/i.test(item.status));
   const sourceMix = topCounts(records, (record) => record.source?.series || "Catalog item")
     .slice(0, 3)
     .map(([label, count]) => `${count} ${label}`)
@@ -414,7 +455,7 @@ function renderWorkbench() {
     metricCard("Selection calls", selectionBoard.length, `${draftSelections.length} draft candidates and ${criticalRequests.length} critical archive asks are ready for compiler triage.`),
     metricCard("Production rows", productionReadiness.length, `${draftReadyRows.length} draft packages can move now; ${requestFirstRows.length} request-first rows block the trade/monetary spine.`),
     metricCard("Summit spine", summitRecords.length, "Tokyo, Venice, Toronto, and G-7 preparation records to anchor industrialized-country cooperation."),
-    metricCard("Open critical gaps", criticalGaps.length, `${gapTracker.length} total gap-tracker items now drive the next source harvest. ${sourceMix}`)
+    metricCard("Annotation queue", annotationQueue.length, `${blockedAnnotations.length} annotation tasks need archive or verification work before final copy; ${criticalGaps.length} critical source gaps remain. ${sourceMix}`)
   );
 }
 
@@ -1020,6 +1061,113 @@ function productionReadinessMemo(item) {
   ].join("\n");
 }
 
+function filteredAnnotations() {
+  return annotationQueue.filter((item) => {
+    if (!matchesQuery(item, state.annotations.query)) return false;
+    if (state.annotations.status && item.status !== state.annotations.status) return false;
+    if (state.annotations.lane && item.lane !== state.annotations.lane) return false;
+    if (state.annotations.type && item.targetType !== state.annotations.type) return false;
+    return true;
+  });
+}
+
+function renderAnnotations() {
+  const statusOrder = new Map([
+    ["Request-blocked", 1],
+    ["Verify first", 2],
+    ["Citation review", 3],
+    ["Authority check", 4],
+    ["Boundary check", 5],
+    ["Context only", 6],
+    ["Ready to draft", 7]
+  ]);
+  const priorityOrder = new Map([
+    ["Critical", 1],
+    ["High", 2],
+    ["Medium", 3],
+    ["Low", 4]
+  ]);
+  const visible = filteredAnnotations().sort(
+    (a, b) =>
+      (statusOrder.get(a.status) || 99) - (statusOrder.get(b.status) || 99) ||
+      (priorityOrder.get(a.priority) || 99) - (priorityOrder.get(b.priority) || 99) ||
+      a.lane.localeCompare(b.lane) ||
+      a.target.localeCompare(b.target)
+  );
+  const counts = topCounts(annotationQueue, (item) => item.status)
+    .map(([label, count]) => `${count} ${label.toLowerCase()}`)
+    .join("; ");
+  nodes.annotationSummary.textContent = `${plural(visible.length, "annotation task")} visible from ${annotationQueue.length} first-reference and issue-note tasks. ${counts}.`;
+  nodes.annotationRoot.replaceChildren(...visible.map(annotationCard));
+  if (!visible.length) nodes.annotationRoot.innerHTML = '<p class="empty">No annotation tasks match the current filters.</p>';
+}
+
+function annotationCard(item) {
+  const card = document.createElement("article");
+  card.className = `file-card annotation-card status-${slug(item.status)}`;
+
+  const header = document.createElement("header");
+  const titleBlock = document.createElement("div");
+  const meta = document.createElement("div");
+  meta.className = "file-meta";
+  meta.append(textSpan(item.id), textSpan(item.priority), textSpan(item.targetType));
+  const title = document.createElement("h3");
+  title.textContent = item.target;
+  titleBlock.append(meta, title);
+  header.append(titleBlock);
+
+  const chips = document.createElement("div");
+  chips.className = "chips";
+  chips.append(
+    chip(item.status, item.status === "Ready to draft" ? "good" : item.status === "Request-blocked" || item.status === "Verify first" ? "warn" : "boundary"),
+    chip(item.lane)
+  );
+
+  const question = document.createElement("p");
+  question.textContent = item.annotationQuestion;
+  const prompt = document.createElement("p");
+  prompt.className = "source-note";
+  prompt.textContent = `Draft prompt: ${item.draftPrompt}`;
+  const verify = document.createElement("p");
+  verify.className = "source-note";
+  verify.textContent = `Verify: ${item.verificationNeeded}`;
+  const firstUse = document.createElement("p");
+  firstUse.className = "source-note";
+  firstUse.textContent = `First use: ${item.firstUse}`;
+  const boundary = document.createElement("p");
+  boundary.className = "source-note";
+  boundary.textContent = `Boundary rule: ${item.boundaryRule}`;
+  const linked = briefList("Linked records", item.linkedRecords);
+
+  const actions = document.createElement("div");
+  actions.className = "file-actions";
+  if (item.sourceUrl) actions.append(linkButton(item.sourceLabel || "Source", item.sourceUrl));
+  actions.append(copyButton(annotationMemo(item), "Copy annotation memo"));
+
+  card.append(header, chips, question, prompt, verify, firstUse, boundary, linked, actions);
+  return card;
+}
+
+function annotationMemo(item) {
+  return [
+    `${item.id}: ${item.target}`,
+    `Priority: ${item.priority}`,
+    `Status: ${item.status}`,
+    `Lane: ${item.lane}`,
+    `Type: ${item.targetType}`,
+    "",
+    `First use: ${item.firstUse}`,
+    `Question: ${item.annotationQuestion}`,
+    `Draft prompt: ${item.draftPrompt}`,
+    `Verify: ${item.verificationNeeded}`,
+    `Source hook: ${item.sourceHook}`,
+    `Boundary rule: ${item.boundaryRule}`,
+    "",
+    `Linked records: ${(item.linkedRecords || []).join("; ")}`,
+    `Export note: ${item.exportNote}`
+  ].join("\n");
+}
+
 function filteredChapterBriefs() {
   return chapterBriefs.filter((brief) => {
     if (!matchesQuery(brief, state.chapterBriefs.query)) return false;
@@ -1123,12 +1271,47 @@ function chapterBriefMemo(brief) {
   ].join("\n");
 }
 
+function filteredSourceCopyLedger() {
+  return sourceCopyLedger.filter((item) => {
+    if (!matchesQuery(item, state.ledger.query)) return false;
+    if (state.ledger.issue && item.issueType !== state.ledger.issue) return false;
+    if (state.ledger.lane && item.lane !== state.ledger.lane) return false;
+    if (state.ledger.priority && item.priority !== state.ledger.priority) return false;
+    return true;
+  });
+}
+
 function renderSourceCopyLedger() {
-  const markerCount = sourceCopyLedger.filter((item) => item.issueType === "Marker / no memorandum").length;
-  const partialCount = sourceCopyLedger.length - markerCount;
-  nodes.ledgerSummary.textContent = `${plural(sourceCopyLedger.length, "row")} in the source-copy ledger: ${plural(markerCount, "marker")} and ${plural(partialCount, "partial, mixed-status, or verification row")}.`;
-  nodes.ledgerRoot.replaceChildren(...sourceCopyLedger.map(ledgerCard));
-  if (!sourceCopyLedger.length) nodes.ledgerRoot.innerHTML = '<p class="empty">No source-copy ledger rows were generated.</p>';
+  const priorityOrder = new Map([
+    ["Critical", 1],
+    ["High", 2],
+    ["Medium", 3],
+    ["Low", 4]
+  ]);
+  const issueOrder = new Map([
+    ["Missing channel", 1],
+    ["Research-room file", 2],
+    ["FOIA folder-list lead", 3],
+    ["Declassified folder PDF", 4],
+    ["Attachment check", 5],
+    ["Digitized reference copy", 6],
+    ["Public-private bridge", 7],
+    ["Marker / no memorandum", 8]
+  ]);
+  const visible = filteredSourceCopyLedger().sort(
+    (a, b) =>
+      (priorityOrder.get(a.priority) || 99) - (priorityOrder.get(b.priority) || 99) ||
+      (issueOrder.get(a.issueType) || 99) - (issueOrder.get(b.issueType) || 99) ||
+      (a.sortDate || "").localeCompare(b.sortDate || "") ||
+      a.title.localeCompare(b.title)
+  );
+  const counts = topCounts(sourceCopyLedger, (item) => item.issueType)
+    .slice(0, 4)
+    .map(([label, count]) => `${count} ${label.toLowerCase()}`)
+    .join("; ");
+  nodes.ledgerSummary.textContent = `${plural(visible.length, "row")} visible from ${sourceCopyLedger.length} source-copy ledger rows. ${counts}.`;
+  nodes.ledgerRoot.replaceChildren(...visible.map(ledgerCard));
+  if (!visible.length) nodes.ledgerRoot.innerHTML = '<p class="empty">No source-copy ledger rows match the current filters.</p>';
 }
 
 function ledgerCard(item) {
@@ -1214,6 +1397,9 @@ function populateFilters() {
   addOptions(nodes.productionStageFilter, uniqueSorted(productionReadiness.map((item) => item.stage)), "All stages");
   addOptions(nodes.productionLaneFilter, uniqueSorted(productionReadiness.map((item) => item.lane)), "All lanes");
   addOptions(nodes.productionPriorityFilter, uniqueSorted(productionReadiness.map((item) => item.priority)), "All priorities");
+  addOptions(nodes.annotationStatusFilter, uniqueSorted(annotationQueue.map((item) => item.status)), "All statuses");
+  addOptions(nodes.annotationLaneFilter, uniqueSorted(annotationQueue.map((item) => item.lane)), "All lanes");
+  addOptions(nodes.annotationTypeFilter, uniqueSorted(annotationQueue.map((item) => item.targetType)), "All types");
   addOptions(nodes.chapterBriefLaneFilter, uniqueSorted(chapterBriefs.map((brief) => brief.lane)), "All lanes");
   addOptions(nodes.chapterBriefUrgencyFilter, uniqueSorted(chapterBriefs.map((brief) => brief.urgency)), "All urgencies");
   addOptions(nodes.gapLaneFilter, uniqueSorted(gapTracker.map((gap) => gap.lane)), "All lanes");
@@ -1228,6 +1414,9 @@ function populateFilters() {
   addOptions(nodes.sourceNotePatternRepositoryFilter, uniqueSorted(sourceNotePatterns.map((pattern) => pattern.repository)), "All repositories");
   addOptions(nodes.sourceNotePatternLaneFilter, uniqueSorted(sourceNotePatterns.map((pattern) => pattern.lane)), "All lanes");
   addOptions(nodes.sourceNotePatternStatusFilter, uniqueSorted(sourceNotePatterns.map((pattern) => pattern.status)), "All statuses");
+  addOptions(nodes.ledgerIssueFilter, uniqueSorted(sourceCopyLedger.map((item) => item.issueType)), "All issue types");
+  addOptions(nodes.ledgerLaneFilter, uniqueSorted(sourceCopyLedger.map((item) => item.lane)), "All lanes");
+  addOptions(nodes.ledgerPriorityFilter, uniqueSorted(sourceCopyLedger.map((item) => item.priority)), "All priorities");
 }
 
 function filteredRecords() {
@@ -1780,6 +1969,51 @@ function setupEvents() {
     );
   });
 
+  nodes.ledgerSearch.addEventListener("input", (event) => {
+    state.ledger.query = event.target.value;
+    renderSourceCopyLedger();
+  });
+  nodes.ledgerIssueFilter.addEventListener("change", (event) => {
+    state.ledger.issue = event.target.value;
+    renderSourceCopyLedger();
+  });
+  nodes.ledgerLaneFilter.addEventListener("change", (event) => {
+    state.ledger.lane = event.target.value;
+    renderSourceCopyLedger();
+  });
+  nodes.ledgerPriorityFilter.addEventListener("change", (event) => {
+    state.ledger.priority = event.target.value;
+    renderSourceCopyLedger();
+  });
+  nodes.clearLedgerFilters.addEventListener("click", () => {
+    state.ledger = { query: "", issue: "", lane: "", priority: "" };
+    nodes.ledgerSearch.value = "";
+    nodes.ledgerIssueFilter.value = "";
+    nodes.ledgerLaneFilter.value = "";
+    nodes.ledgerPriorityFilter.value = "";
+    renderSourceCopyLedger();
+  });
+  nodes.exportLedger.addEventListener("click", () => {
+    downloadCsv(
+      "frus-volume37-source-copy-ledger.csv",
+      toCsv(filteredSourceCopyLedger(), [
+        { label: "Issue Type", value: (item) => item.issueType },
+        { label: "Priority", value: (item) => item.priority },
+        { label: "Date", value: (item) => item.dateText || item.date },
+        { label: "Lane", value: (item) => item.lane },
+        { label: "Country", value: (item) => item.country },
+        { label: "Title", value: (item) => item.title },
+        { label: "Identifier", value: (item) => item.identifier || item.naid },
+        { label: "Release Status", value: (item) => item.releaseStatus },
+        { label: "Participants", value: (item) => (item.participants || []).join("; ") },
+        { label: "Action", value: (item) => item.action },
+        { label: "Source URL", value: (item) => item.catalogUrl },
+        { label: "PDF URL", value: (item) => item.pdfUrl },
+        { label: "FRUS Source Note", value: (item) => item.frusSourceNote }
+      ])
+    );
+  });
+
   nodes.selectionSearch.addEventListener("input", (event) => {
     state.selections.query = event.target.value;
     renderSelectionBoard();
@@ -1869,6 +2103,53 @@ function setupEvents() {
         { label: "Source Note", value: (item) => item.sourceNote },
         { label: "Source URL", value: (item) => item.catalogUrl },
         { label: "PDF URL", value: (item) => item.pdfUrl }
+      ])
+    );
+  });
+
+  nodes.annotationSearch.addEventListener("input", (event) => {
+    state.annotations.query = event.target.value;
+    renderAnnotations();
+  });
+  nodes.annotationStatusFilter.addEventListener("change", (event) => {
+    state.annotations.status = event.target.value;
+    renderAnnotations();
+  });
+  nodes.annotationLaneFilter.addEventListener("change", (event) => {
+    state.annotations.lane = event.target.value;
+    renderAnnotations();
+  });
+  nodes.annotationTypeFilter.addEventListener("change", (event) => {
+    state.annotations.type = event.target.value;
+    renderAnnotations();
+  });
+  nodes.clearAnnotationFilters.addEventListener("click", () => {
+    state.annotations = { query: "", status: "", lane: "", type: "" };
+    nodes.annotationSearch.value = "";
+    nodes.annotationStatusFilter.value = "";
+    nodes.annotationLaneFilter.value = "";
+    nodes.annotationTypeFilter.value = "";
+    renderAnnotations();
+  });
+  nodes.exportAnnotations.addEventListener("click", () => {
+    downloadCsv(
+      "frus-volume37-annotation-queue.csv",
+      toCsv(filteredAnnotations(), [
+        { label: "Annotation ID", value: (item) => item.id },
+        { label: "Priority", value: (item) => item.priority },
+        { label: "Status", value: (item) => item.status },
+        { label: "Lane", value: (item) => item.lane },
+        { label: "Target Type", value: (item) => item.targetType },
+        { label: "Target", value: (item) => item.target },
+        { label: "Linked Records", value: (item) => (item.linkedRecords || []).join("; ") },
+        { label: "First Use", value: (item) => item.firstUse },
+        { label: "Annotation Question", value: (item) => item.annotationQuestion },
+        { label: "Draft Prompt", value: (item) => item.draftPrompt },
+        { label: "Verification Needed", value: (item) => item.verificationNeeded },
+        { label: "Source Hook", value: (item) => item.sourceHook },
+        { label: "Boundary Rule", value: (item) => item.boundaryRule },
+        { label: "Export Note", value: (item) => item.exportNote },
+        { label: "Source URL", value: (item) => item.sourceUrl }
       ])
     );
   });
@@ -2047,6 +2328,7 @@ function init() {
   renderWorkbench();
   renderSelectionBoard();
   renderProductionReadiness();
+  renderAnnotations();
   renderChapterBriefs();
   renderGapTracker();
   renderSourcePools();

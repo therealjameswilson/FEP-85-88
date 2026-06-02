@@ -18,8 +18,9 @@ Official volume page: <https://history.state.gov/historicaldocuments/frus1981-88
 - source-note pattern lab for Reagan Library, NARA, Public Papers, NSDD, and Daily Diary citation formats
 - selection board for draft candidates, context anchors, request-first leads, and boundary/exclusion calls
 - production-readiness worksheet for draft packages, citation review, attachment checks, request-first blockers, and boundary holds
+- annotation queue for first-reference notes, issue prompts, verification needs, authority checks, and boundary rules
 - chapter briefs with document spines, must-harvest items, annotation questions, exclusion rules, and copyable assembly memos
-- source-copy ledger for attachment checks, missing channels, and public-private bridge work
+- searchable/exportable source-copy ledger for attachment checks, missing channels, and public-private bridge work
 - policy file anchors for Reagan Library, Public Papers, Treasury/Fed routing, and adjacent FRUS volumes
 - declassified Reagan Library leads from Danzansky, Baker, and Sprinkel files
 - NARA RG 56, RG 59, and RG 364 source-note targets modeled on the same compiler's Carter foreign economic policy volume

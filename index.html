@@ -517,7 +517,27 @@
           <p class="kicker">Source-Copy Ledger</p>
           <h2 id="ledger-title">Partials, Research-Room Leads, And Verification Rows</h2>
         </div>
-        <p id="ledger-summary" class="summary ledger-summary">Loading source-copy ledger...</p>
+        <div class="tools" aria-label="Search and filter source-copy ledger">
+          <label class="search-field">
+            <span>Search ledger</span>
+            <input id="ledger-search" type="search" placeholder="Search issue, source note, action, participants, repository" />
+          </label>
+          <label>
+            <span>Issue</span>
+            <select id="ledger-issue-filter"></select>
+          </label>
+          <label>
+            <span>Lane</span>
+            <select id="ledger-lane-filter"></select>
+          </label>
+          <label>
+            <span>Priority</span>
+            <select id="ledger-priority-filter"></select>
+          </label>
+          <button id="clear-ledger-filters" type="button">Reset</button>
+          <button id="export-ledger" type="button">CSV</button>
+          <p id="ledger-summary" class="summary ledger-summary">Loading source-copy ledger...</p>
+        </div>
         <div id="ledger-root" class="records-root compact-records" aria-live="polite">
           <p class="loading">Loading source-copy ledger...</p>
         </div>

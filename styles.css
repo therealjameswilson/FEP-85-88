@@ -461,6 +461,8 @@ dd {
 }
 
 .production-section .tools,
+.annotation-section .tools,
+.ledger-section .tools,
 .source-note-pattern-section .tools {
   grid-template-columns: minmax(250px, 2fr) repeat(3, minmax(140px, 1fr)) auto auto;
 }
@@ -889,6 +891,34 @@ summary {
   border-top: 4px solid var(--plum);
 }
 
+.annotation-card.status-request-blocked {
+  border-top-color: var(--rust);
+}
+
+.annotation-card.status-verify-first {
+  border-top-color: var(--gold);
+}
+
+.annotation-card.status-citation-review {
+  border-top-color: var(--blue);
+}
+
+.annotation-card.status-authority-check {
+  border-top-color: var(--plum);
+}
+
+.annotation-card.status-boundary-check {
+  border-top-color: var(--plum);
+}
+
+.annotation-card.status-context-only {
+  border-top-color: var(--navy);
+}
+
+.annotation-card.status-ready-to-draft {
+  border-top-color: var(--green);
+}
+
 .ledger-card.partial-ledger {
   border-top: 4px solid var(--gold);
 }
@@ -1004,6 +1034,8 @@ footer {
   .policy-section .tools,
   .gap-section .tools,
   .production-section .tools,
+  .annotation-section .tools,
+  .ledger-section .tools,
   .source-note-pattern-section .tools,
   .source-pool-section .tools,
   .persons-tools,
@@ -1055,6 +1087,8 @@ footer {
   .policy-section .tools,
   .gap-section .tools,
   .production-section .tools,
+  .annotation-section .tools,
+  .ledger-section .tools,
   .source-note-pattern-section .tools,
   .source-pool-section .tools,
   .persons-tools,
