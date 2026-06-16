@@ -13,8 +13,14 @@ const sourceNotePatterns = window.SOURCE_NOTE_PATTERNS || [];
 const productionReadiness = window.PRODUCTION_READINESS || [];
 const annotationQueue = window.ANNOTATION_QUEUE || [];
 const sourceCopyLedger = window.SOURCE_COPY_LEDGER || [];
+const persons = window.PERSONS || [];
 const chapters = meta.chapters || [];
+const pageBudget = window.PAGE_BUDGET || {};
 const sourceNoteAudit = buildSourceNoteAudit();
+const sourceCoverageRows = buildSourceCoverageRows();
+const sourcePrecedentRows = buildSourcePrecedentRows();
+const dateControlRows = buildDateControlRows();
+const provenanceRows = buildProvenanceRows();
 
 const state = {
   records: {
@@ -35,7 +41,8 @@ const state = {
   },
   boundary: {
     query: "",
-    country: ""
+    country: "",
+    type: ""
   },
   selections: {
     query: "",
@@ -78,7 +85,24 @@ const state = {
   sourceNotes: {
     query: "",
     status: "",
-    section: ""
+    section: "",
+    format: ""
+  },
+  sourceCoverage: {
+    query: "",
+    status: "",
+    format: ""
+  },
+  sourcePrecedents: {
+    query: "",
+    status: "",
+    family: "",
+    precedent: ""
+  },
+  dateControls: {
+    query: "",
+    lane: "",
+    priority: ""
   },
   sourceNotePatterns: {
     query: "",
@@ -91,6 +115,11 @@ const state = {
     issue: "",
     lane: "",
     priority: ""
+  },
+  provenance: {
+    query: "",
+    repository: "",
+    lane: ""
   }
 };
 
@@ -101,6 +130,11 @@ const nodes = {
   publicCount: document.querySelector("#public-count"),
   boundaryCount: document.querySelector("#boundary-count"),
   workbenchRoot: document.querySelector("#workbench-root"),
+  copyWorkbenchPacket: document.querySelector("#copy-workbench-packet"),
+  pageBudgetRoot: document.querySelector("#page-budget-root"),
+  pageBudgetSummary: document.querySelector("#page-budget-summary"),
+  copyPageBudgetBrief: document.querySelector("#copy-page-budget-brief"),
+  exportPageBudget: document.querySelector("#export-page-budget"),
   chapterGrid: document.querySelector("#chapter-grid"),
   recordsRoot: document.querySelector("#records-root"),
   recordsSummary: document.querySelector("#records-summary"),
@@ -128,13 +162,16 @@ const nodes = {
   boundarySummary: document.querySelector("#boundary-summary"),
   boundarySearch: document.querySelector("#boundary-search"),
   boundaryCountryFilter: document.querySelector("#boundary-country-filter"),
+  boundaryTypeFilter: document.querySelector("#boundary-type-filter"),
   clearBoundaryFilters: document.querySelector("#clear-boundary-filters"),
+  exportBoundary: document.querySelector("#export-boundary"),
   selectionRoot: document.querySelector("#selection-root"),
   selectionSummary: document.querySelector("#selection-summary"),
   selectionSearch: document.querySelector("#selection-search"),
   selectionStatusFilter: document.querySelector("#selection-status-filter"),
   selectionLaneFilter: document.querySelector("#selection-lane-filter"),
   clearSelectionFilters: document.querySelector("#clear-selection-filters"),
+  copySelectionDossier: document.querySelector("#copy-selection-dossier"),
   exportSelections: document.querySelector("#export-selections"),
   productionRoot: document.querySelector("#production-root"),
   productionSummary: document.querySelector("#production-summary"),
@@ -180,14 +217,42 @@ const nodes = {
   requestRepositoryFilter: document.querySelector("#request-repository-filter"),
   requestPriorityFilter: document.querySelector("#request-priority-filter"),
   clearRequestFilters: document.querySelector("#clear-request-filters"),
+  copyRequestBundle: document.querySelector("#copy-request-bundle"),
   exportRequests: document.querySelector("#export-requests"),
   sourceNoteRoot: document.querySelector("#source-note-root"),
   sourceNoteSummary: document.querySelector("#source-note-summary"),
   sourceNoteSearch: document.querySelector("#source-note-search"),
   sourceNoteStatusFilter: document.querySelector("#source-note-status-filter"),
   sourceNoteSectionFilter: document.querySelector("#source-note-section-filter"),
+  sourceNoteFormatFilter: document.querySelector("#source-note-format-filter"),
   clearSourceNoteFilters: document.querySelector("#clear-source-note-filters"),
+  copySourceNoteFixes: document.querySelector("#copy-source-note-fixes"),
   exportSourceNotes: document.querySelector("#export-source-notes"),
+  sourceCoverageRoot: document.querySelector("#source-coverage-root"),
+  sourceCoverageSummary: document.querySelector("#source-coverage-summary"),
+  sourceCoverageSearch: document.querySelector("#source-coverage-search"),
+  sourceCoverageStatusFilter: document.querySelector("#source-coverage-status-filter"),
+  sourceCoverageFormatFilter: document.querySelector("#source-coverage-format-filter"),
+  clearSourceCoverageFilters: document.querySelector("#clear-source-coverage-filters"),
+  copySourceCoverageBrief: document.querySelector("#copy-source-coverage-brief"),
+  exportSourceCoverage: document.querySelector("#export-source-coverage"),
+  sourcePrecedentRoot: document.querySelector("#source-precedent-root"),
+  sourcePrecedentSummary: document.querySelector("#source-precedent-summary"),
+  sourcePrecedentSearch: document.querySelector("#source-precedent-search"),
+  sourcePrecedentStatusFilter: document.querySelector("#source-precedent-status-filter"),
+  sourcePrecedentFamilyFilter: document.querySelector("#source-precedent-family-filter"),
+  sourcePrecedentModelFilter: document.querySelector("#source-precedent-model-filter"),
+  clearSourcePrecedentFilters: document.querySelector("#clear-source-precedent-filters"),
+  copySourcePrecedentChecklist: document.querySelector("#copy-source-precedent-checklist"),
+  exportSourcePrecedents: document.querySelector("#export-source-precedents"),
+  dateControlRoot: document.querySelector("#date-control-root"),
+  dateControlSummary: document.querySelector("#date-control-summary"),
+  dateControlSearch: document.querySelector("#date-control-search"),
+  dateControlLaneFilter: document.querySelector("#date-control-lane-filter"),
+  dateControlPriorityFilter: document.querySelector("#date-control-priority-filter"),
+  clearDateControlFilters: document.querySelector("#clear-date-control-filters"),
+  copyDateControlBrief: document.querySelector("#copy-date-control-brief"),
+  exportDateControls: document.querySelector("#export-date-controls"),
   sourceNotePatternRoot: document.querySelector("#source-note-pattern-root"),
   sourceNotePatternSummary: document.querySelector("#source-note-pattern-summary"),
   sourceNotePatternSearch: document.querySelector("#source-note-pattern-search"),
@@ -203,8 +268,207 @@ const nodes = {
   ledgerLaneFilter: document.querySelector("#ledger-lane-filter"),
   ledgerPriorityFilter: document.querySelector("#ledger-priority-filter"),
   clearLedgerFilters: document.querySelector("#clear-ledger-filters"),
-  exportLedger: document.querySelector("#export-ledger")
+  exportLedger: document.querySelector("#export-ledger"),
+  provenanceRoot: document.querySelector("#provenance-root"),
+  provenanceSummary: document.querySelector("#provenance-summary"),
+  provenanceSearch: document.querySelector("#provenance-search"),
+  provenanceRepositoryFilter: document.querySelector("#provenance-repository-filter"),
+  provenanceLaneFilter: document.querySelector("#provenance-lane-filter"),
+  clearProvenanceFilters: document.querySelector("#clear-provenance-filters"),
+  copyProvenanceBundle: document.querySelector("#copy-provenance-bundle"),
+  exportProvenance: document.querySelector("#export-provenance")
 };
+
+const viewConfigs = [
+  {
+    sectionId: "records",
+    stateKey: "records",
+    resetNode: nodes.clearRecordFilters,
+    fields: [
+      { key: "query", param: "rq", node: nodes.recordSearch },
+      { key: "chapter", param: "rchapter", node: nodes.chapterFilter },
+      { key: "country", param: "rcountry", node: nodes.countryFilter },
+      { key: "release", param: "rrelease", node: nodes.releaseFilter },
+      { key: "availability", param: "ravailability", node: nodes.availabilityFilter }
+    ]
+  },
+  {
+    sectionId: "selection-board",
+    stateKey: "selections",
+    resetNode: nodes.clearSelectionFilters,
+    fields: [
+      { key: "query", param: "sq", node: nodes.selectionSearch },
+      { key: "status", param: "sstatus", node: nodes.selectionStatusFilter },
+      { key: "lane", param: "slane", node: nodes.selectionLaneFilter }
+    ]
+  },
+  {
+    sectionId: "production-readiness",
+    stateKey: "production",
+    resetNode: nodes.clearProductionFilters,
+    fields: [
+      { key: "query", param: "prodq", node: nodes.productionSearch },
+      { key: "stage", param: "prodstage", node: nodes.productionStageFilter },
+      { key: "lane", param: "prodlane", node: nodes.productionLaneFilter },
+      { key: "priority", param: "prodpriority", node: nodes.productionPriorityFilter }
+    ]
+  },
+  {
+    sectionId: "annotation-queue",
+    stateKey: "annotations",
+    resetNode: nodes.clearAnnotationFilters,
+    fields: [
+      { key: "query", param: "aq", node: nodes.annotationSearch },
+      { key: "status", param: "astatus", node: nodes.annotationStatusFilter },
+      { key: "lane", param: "alane", node: nodes.annotationLaneFilter },
+      { key: "type", param: "atype", node: nodes.annotationTypeFilter }
+    ]
+  },
+  {
+    sectionId: "chapter-briefs",
+    stateKey: "chapterBriefs",
+    resetNode: nodes.clearChapterBriefFilters,
+    fields: [
+      { key: "query", param: "cbq", node: nodes.chapterBriefSearch },
+      { key: "lane", param: "cblane", node: nodes.chapterBriefLaneFilter },
+      { key: "urgency", param: "cburgency", node: nodes.chapterBriefUrgencyFilter }
+    ]
+  },
+  {
+    sectionId: "gap-tracker",
+    stateKey: "gaps",
+    resetNode: nodes.clearGapFilters,
+    fields: [
+      { key: "query", param: "gq", node: nodes.gapSearch },
+      { key: "lane", param: "glane", node: nodes.gapLaneFilter },
+      { key: "priority", param: "gpriority", node: nodes.gapPriorityFilter },
+      { key: "status", param: "gstatus", node: nodes.gapStatusFilter }
+    ]
+  },
+  {
+    sectionId: "source-pools",
+    stateKey: "sourcePools",
+    resetNode: nodes.clearSourcePoolFilters,
+    fields: [
+      { key: "query", param: "spq", node: nodes.sourcePoolSearch },
+      { key: "lane", param: "splane", node: nodes.sourcePoolLaneFilter },
+      { key: "priority", param: "sppriority", node: nodes.sourcePoolPriorityFilter }
+    ]
+  },
+  {
+    sectionId: "request-packets",
+    stateKey: "requests",
+    resetNode: nodes.clearRequestFilters,
+    fields: [
+      { key: "query", param: "reqq", node: nodes.requestSearch },
+      { key: "repository", param: "reqrepository", node: nodes.requestRepositoryFilter },
+      { key: "priority", param: "reqpriority", node: nodes.requestPriorityFilter }
+    ]
+  },
+  {
+    sectionId: "source-note-qa",
+    stateKey: "sourceNotes",
+    resetNode: nodes.clearSourceNoteFilters,
+    fields: [
+      { key: "query", param: "snq", node: nodes.sourceNoteSearch },
+      { key: "status", param: "snstatus", node: nodes.sourceNoteStatusFilter },
+      { key: "section", param: "snsection", node: nodes.sourceNoteSectionFilter },
+      { key: "format", param: "snformat", node: nodes.sourceNoteFormatFilter }
+    ]
+  },
+  {
+    sectionId: "source-coverage",
+    stateKey: "sourceCoverage",
+    resetNode: nodes.clearSourceCoverageFilters,
+    fields: [
+      { key: "query", param: "scq", node: nodes.sourceCoverageSearch },
+      { key: "status", param: "scstatus", node: nodes.sourceCoverageStatusFilter },
+      { key: "format", param: "scformat", node: nodes.sourceCoverageFormatFilter }
+    ]
+  },
+  {
+    sectionId: "source-precedents",
+    stateKey: "sourcePrecedents",
+    resetNode: nodes.clearSourcePrecedentFilters,
+    fields: [
+      { key: "query", param: "spreq", node: nodes.sourcePrecedentSearch },
+      { key: "status", param: "sprestatus", node: nodes.sourcePrecedentStatusFilter },
+      { key: "family", param: "sprefamily", node: nodes.sourcePrecedentFamilyFilter },
+      { key: "precedent", param: "spremodel", node: nodes.sourcePrecedentModelFilter }
+    ]
+  },
+  {
+    sectionId: "date-control",
+    stateKey: "dateControls",
+    resetNode: nodes.clearDateControlFilters,
+    fields: [
+      { key: "query", param: "dcq", node: nodes.dateControlSearch },
+      { key: "lane", param: "dclane", node: nodes.dateControlLaneFilter },
+      { key: "priority", param: "dcpriority", node: nodes.dateControlPriorityFilter }
+    ]
+  },
+  {
+    sectionId: "source-note-patterns",
+    stateKey: "sourceNotePatterns",
+    resetNode: nodes.clearSourceNotePatternFilters,
+    fields: [
+      { key: "query", param: "snpq", node: nodes.sourceNotePatternSearch },
+      { key: "repository", param: "snprepository", node: nodes.sourceNotePatternRepositoryFilter },
+      { key: "lane", param: "snplane", node: nodes.sourceNotePatternLaneFilter },
+      { key: "status", param: "snpstatus", node: nodes.sourceNotePatternStatusFilter }
+    ]
+  },
+  {
+    sectionId: "source-copy-ledger",
+    stateKey: "ledger",
+    resetNode: nodes.clearLedgerFilters,
+    fields: [
+      { key: "query", param: "ledq", node: nodes.ledgerSearch },
+      { key: "issue", param: "ledissue", node: nodes.ledgerIssueFilter },
+      { key: "lane", param: "ledlane", node: nodes.ledgerLaneFilter },
+      { key: "priority", param: "ledpriority", node: nodes.ledgerPriorityFilter }
+    ]
+  },
+  {
+    sectionId: "provenance-sheets",
+    stateKey: "provenance",
+    resetNode: nodes.clearProvenanceFilters,
+    fields: [
+      { key: "query", param: "pvq", node: nodes.provenanceSearch },
+      { key: "repository", param: "pvrepo", node: nodes.provenanceRepositoryFilter },
+      { key: "lane", param: "pvlane", node: nodes.provenanceLaneFilter }
+    ]
+  },
+  {
+    sectionId: "policy-files",
+    stateKey: "policy",
+    resetNode: nodes.clearPolicyFilters,
+    fields: [
+      { key: "query", param: "polq", node: nodes.policySearch },
+      { key: "lane", param: "pollane", node: nodes.policyLaneFilter },
+      { key: "priority", param: "polpriority", node: nodes.policyPriorityFilter }
+    ]
+  },
+  {
+    sectionId: "public-references",
+    stateKey: "public",
+    resetNode: nodes.clearPublicFilters,
+    fields: [
+      { key: "query", param: "pubq", node: nodes.publicSearch },
+      { key: "lane", param: "publane", node: nodes.publicLaneFilter }
+    ]
+  },
+  {
+    sectionId: "boundary",
+    stateKey: "boundary",
+    resetNode: nodes.clearBoundaryFilters,
+    fields: [
+      { key: "query", param: "bq", node: nodes.boundarySearch },
+      { key: "country", param: "bcountry", node: nodes.boundaryCountryFilter },
+      { key: "type", param: "btype", node: nodes.boundaryTypeFilter }
+    ]
+  }
+];
 
 function assignCompilerNumbers(items) {
   const counts = new Map();
@@ -320,6 +584,7 @@ function searchText(item) {
     item.unresolvedRisk,
     item.urgency,
     item.sourceTitle,
+    item.formatFamily,
     item.sourceNote,
     item.section,
     item.assessment,
@@ -336,7 +601,26 @@ function searchText(item) {
     item.matchedTerms?.join(" "),
     item.nextActions?.join(" "),
     item.targetTerms?.join(" "),
-    item.sourcePools?.join(" ")
+    item.sourcePools?.join(" "),
+    item.coverageId,
+    item.formatFamily,
+    item.risk,
+    item.nextAction,
+    item.sections,
+    item.sampleTitles?.join(" "),
+    item.precedentId,
+    item.matchStatus,
+    item.precedentModel,
+    item.expectedShape,
+    item.officialModel,
+    item.repairActions?.join(" "),
+    item.controlId,
+    item.controlType,
+    item.sourceType,
+    item.dateRisk,
+    item.diaryAsk,
+    item.publicAnchor,
+    item.internalBridge
   ]
     .filter(Boolean)
     .join(" ")
@@ -354,6 +638,139 @@ function matchesQuery(item, query) {
   return terms.every((term) => haystack.includes(term));
 }
 
+function viewConfigForSection(sectionId) {
+  return viewConfigs.find((config) => config.sectionId === sectionId);
+}
+
+function viewFieldForNode(node) {
+  for (const config of viewConfigs) {
+    for (const field of config.fields) {
+      if (field.node === node) return { config, field };
+    }
+  }
+  return null;
+}
+
+function viewConfigForReset(node) {
+  return viewConfigs.find((config) => config.resetNode === node);
+}
+
+function setViewField(config, field, value) {
+  if (!state[config.stateKey]) return;
+  const normalizedValue = value || "";
+  if (field.node?.tagName === "SELECT" && normalizedValue && !selectHasValue(field.node, normalizedValue)) return;
+  state[config.stateKey][field.key] = normalizedValue;
+  if (field.node) field.node.value = normalizedValue;
+}
+
+function selectHasValue(select, value) {
+  return [...select.options].some((option) => option.value === value);
+}
+
+function restoreUrlState() {
+  const params = new URLSearchParams(window.location.search);
+  for (const config of viewConfigs) {
+    for (const field of config.fields) {
+      if (params.has(field.param)) setViewField(config, field, params.get(field.param));
+    }
+  }
+}
+
+function stateParamEntries(configs = viewConfigs) {
+  const entries = [];
+  for (const config of configs) {
+    for (const field of config.fields) {
+      const value = state[config.stateKey]?.[field.key] || "";
+      if (value) entries.push([field.param, value]);
+    }
+  }
+  return entries;
+}
+
+function currentStateParams(configs = viewConfigs) {
+  const params = new URLSearchParams();
+  for (const [key, value] of stateParamEntries(configs)) params.set(key, value);
+  return params;
+}
+
+function sectionViewUrl(sectionId) {
+  const config = viewConfigForSection(sectionId);
+  const url = new URL(window.location.href);
+  url.search = config ? currentStateParams([config]).toString() : "";
+  url.hash = sectionId;
+  return url.toString();
+}
+
+function syncUrlState(sectionId) {
+  if (!window.history?.replaceState) return;
+  const url = new URL(window.location.href);
+  url.search = currentStateParams().toString();
+  if (sectionId) url.hash = sectionId;
+  window.history.replaceState(null, "", url);
+}
+
+async function copyViewUrl(button, sectionId) {
+  const label = button.textContent;
+  let copied = false;
+  try {
+    copied = await writeClipboardText(sectionViewUrl(sectionId));
+  } catch (error) {
+    copied = false;
+  }
+  button.textContent = copied ? "Copied" : "Copy failed";
+  if (copied) button.dataset.copied = "true";
+  else button.dataset.copyFailed = "true";
+  setTimeout(() => {
+    button.textContent = label;
+    delete button.dataset.copied;
+    delete button.dataset.copyFailed;
+  }, 1200);
+}
+
+function setupViewStateEvents() {
+  const syncInput = (event) => {
+    const match = viewFieldForNode(event.target);
+    if (match) syncUrlState(match.config.sectionId);
+  };
+
+  document.addEventListener("input", syncInput);
+  document.addEventListener("change", syncInput);
+  document.addEventListener("click", (event) => {
+    const copyViewButton = event.target.closest("[data-copy-view]");
+    if (copyViewButton) {
+      copyViewUrl(copyViewButton, copyViewButton.dataset.copyView);
+      return;
+    }
+    const resetConfig = viewConfigForReset(event.target);
+    if (resetConfig) syncUrlState(resetConfig.sectionId);
+  });
+  document.addEventListener("DOMContentLoaded", scheduleCurrentHashScroll);
+  window.addEventListener("load", scheduleCurrentHashScroll);
+  window.addEventListener("hashchange", scheduleCurrentHashScroll);
+}
+
+function scrollToCurrentHash() {
+  const id = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+  if (!id) return;
+  const target = document.getElementById(id);
+  if (!target) return;
+  const headerHeight = document.querySelector(".site-header")?.getBoundingClientRect().height || 0;
+  const top = target.getBoundingClientRect().top + window.scrollY - headerHeight - 16;
+  const targetTop = Math.max(0, top);
+  window.scrollTo({ top: targetTop, behavior: "auto" });
+  if (document.scrollingElement) document.scrollingElement.scrollTop = targetTop;
+  document.documentElement.scrollTop = targetTop;
+  document.body.scrollTop = targetTop;
+  window.__frusLastHashScroll = { id, targetTop, headerHeight, at: Date.now() };
+}
+
+function scheduleCurrentHashScroll() {
+  if (!window.location.hash) return;
+  setTimeout(scrollToCurrentHash, 0);
+  requestAnimationFrame(() => requestAnimationFrame(scrollToCurrentHash));
+  [150, 500, 1000, 1800].forEach((delay) => setTimeout(scrollToCurrentHash, delay));
+}
+
 function buildSourceNoteAudit() {
   const rows = [];
   const add = (section, item, note, options = {}) => {
@@ -367,6 +784,7 @@ function buildSourceNoteAudit() {
       lane: options.lane || item.chapter?.name || item.lane || item.chapter || "Unassigned",
       dateText: options.dateText || item.dateText || item.date || item.sourceWindow || "",
       sourceNote: note,
+      formatFamily: sourceNoteFamily(note),
       catalogUrl: options.catalogUrl || item.catalogUrl || item.govinfoUrl || item.url || "",
       pdfUrl: options.pdfUrl || item.pdfUrl || "",
       requestText: item.requestText || "",
@@ -392,6 +810,18 @@ function buildSourceNoteAudit() {
   return rows.map((row, index) => ({ ...row, auditId: `SN-${String(index + 1).padStart(3, "0")}` }));
 }
 
+function sourceNoteFamily(note) {
+  const trimmed = String(note || "");
+  if (/Public Papers/i.test(trimmed)) return "Public Papers";
+  if (/National Archives,\s*RG 56/i.test(trimmed)) return "NARA RG 56";
+  if (/National Archives,\s*RG 59/i.test(trimmed)) return "NARA RG 59";
+  if (/National Archives,\s*RG 364/i.test(trimmed)) return "NARA RG 364";
+  if (/Daily Diary/i.test(trimmed)) return "Daily Diary";
+  if (/Reagan Library/i.test(trimmed)) return "Reagan Library";
+  if (/Foreign Relations of the United States|source-base precedent|to be normalized/i.test(trimmed)) return "Reference";
+  return "Other";
+}
+
 function assessSourceNote(note) {
   const flags = [];
   const trimmed = String(note || "").trim();
@@ -403,22 +833,36 @@ function assessSourceNote(note) {
     trimmed.startsWith("See source-base precedent") ||
     /to be normalized after archival target is confirmed/i.test(trimmed);
   const hasFinalPunctuation = /[.!?]$/.test(trimmed);
+  const isPublicPapers = /Public Papers/i.test(trimmed);
+  const usesFrusPublicPapersShortForm = /^Source: Public Papers: Reagan, \d{4}, (?:Book [IVX]+, )?pp\. \d/i.test(trimmed);
+  const isReaganManuscriptSource = isSource && /Source: Reagan Library/.test(trimmed) && !/Public Papers|Daily Diary/i.test(trimmed);
+  const isReaganStaffFileSource = isReaganManuscriptSource && /Danzansky|Baker|Sprinkel|Regan|WHORM|Staff|Files/i.test(trimmed);
+  const isNationalArchivesSource = isSource && /National Archives,\s*RG \d+/i.test(trimmed);
   const needsReaganClassification = isSource && /Source: Reagan Library/.test(trimmed) && !/Public Papers|Daily Diary/i.test(trimmed);
-  const hasClassification =
-    /\b(Secret|Confidential|No classification marking|Limited Official Use|Unclassified)\.$/i.test(trimmed) ||
-    /\bNo classification marking\./i.test(trimmed);
+  const hasClassification = /\b(Secret|Confidential|No classification marking|Limited Official Use|Unclassified)\./i.test(trimmed);
 
   if (isTarget) flags.push("Target note: do not publish until box/folder/document details are verified.");
   if (hasPlaceholder) flags.push("Contains unresolved bracket placeholder.");
   if (!hasFinalPunctuation) flags.push("Needs final punctuation.");
   if (isSource && hasPlaceholder) flags.push("Copy-ready prefix used with unresolved placeholder.");
   if (needsReaganClassification && !hasClassification) flags.push("Verify classification or handling line before publication.");
+  if (isPublicPapers && isSource && !usesFrusPublicPapersShortForm) {
+    flags.push("Public Papers citation should use FRUS short form: Source: Public Papers: Reagan, [year], [Book], pp. [pages].");
+  }
+  if (isPublicPapers && isSource && !/\bpp\.\s*\d/i.test(trimmed)) {
+    flags.push("Public Papers citation needs page range before it is publication-ready.");
+  }
+  if (isReaganStaffFileSource && !/NLR|No drafting information|drafting|meeting took place|Copies? (?:were|was) sent|Sent through/i.test(trimmed)) {
+    flags.push("Reagan Library staff-file note needs document-level control/context such as NLR, drafting, meeting, routing, or copy disposition.");
+  }
+  if (isNationalArchivesSource && !/\bBox\s+\d+/i.test(trimmed)) flags.push("National Archives source note needs box data.");
+  if (isNationalArchivesSource && !hasClassification) flags.push("National Archives source note needs classification or handling line.");
   if (!isSource && !isTarget && !isReference) flags.push("Non-standard source-note prefix.");
   if (/^Source: Public Papers of the Presidents of the United States: Ronald Reagan\.$/.test(trimmed)) {
     flags.push("Collection-level Public Papers note; replace with document-level citation when selecting a document.");
   }
 
-  if (flags.some((flag) => /Copy-ready prefix|punctuation|classification|Non-standard|Collection-level/i.test(flag))) {
+  if (flags.some((flag) => /Copy-ready prefix|punctuation|classification|Non-standard|Collection-level|Public Papers|page range|control\/context|box data|handling line/i.test(flag))) {
     return { status: "Needs review", flags };
   }
   if (isTarget || hasPlaceholder) return { status: "Target", flags };
@@ -452,6 +896,7 @@ function renderWorkbench() {
 
   nodes.workbenchRoot.replaceChildren(
     metricCard("Chronology leads", records.length, `${openReferences.length} open web/PDF anchors across NSDDs, summit records, and Public Papers.`),
+    metricCard("Page cap", pageBudget.totalPages || 1400, `${pageBudget.documentTargetPages || 1120} pages reserved for selected documents; source-copy PDFs require appended provenance sheets.`),
     metricCard("Selection calls", selectionBoard.length, `${draftSelections.length} draft candidates and ${criticalRequests.length} critical archive asks are ready for compiler triage.`),
     metricCard("Production rows", productionReadiness.length, `${draftReadyRows.length} draft packages can move now; ${requestFirstRows.length} request-first rows block the trade/monetary spine.`),
     metricCard("Summit spine", summitRecords.length, "Tokyo, Venice, Toronto, and G-7 preparation records to anchor industrialized-country cooperation."),
@@ -470,6 +915,189 @@ function metricCard(label, value, detail) {
   paragraph.textContent = detail;
   card.append(strong, span, paragraph);
   return card;
+}
+
+function priorityRank(priority) {
+  return { Critical: 1, High: 2, Medium: 3, Low: 4 }[priority] || 9;
+}
+
+function packetTitle(item) {
+  return item.title || item.target || item.workingTitle || item.recordId || item.id || "Untitled row";
+}
+
+function packetSort(a, b) {
+  return (
+    priorityRank(a.priority) - priorityRank(b.priority) ||
+    (a.lane || "").localeCompare(b.lane || "") ||
+    packetTitle(a).localeCompare(packetTitle(b))
+  );
+}
+
+function selectionStatusRank(status) {
+  return {
+    "Draft candidate": 1,
+    "Request-first": 2,
+    "Context anchor": 3,
+    "Boundary / exclude unless needed": 4
+  }[status] || 99;
+}
+
+function selectionSort(a, b) {
+  return (
+    selectionStatusRank(a.status) - selectionStatusRank(b.status) ||
+    priorityRank(a.priority) - priorityRank(b.priority) ||
+    (a.lane || "").localeCompare(b.lane || "") ||
+    (a.title || "").localeCompare(b.title || "")
+  );
+}
+
+function packetSection(title, items, mapper) {
+  const rows = [`${title}:`];
+  if (!items.length) {
+    rows.push("- None currently flagged.");
+    return rows;
+  }
+  for (const item of [...items].sort(packetSort)) rows.push(`- ${mapper(item)}`);
+  return rows;
+}
+
+function workbenchPacketText() {
+  const draftReadyRows = productionReadiness.filter((item) => item.stage === "Draft package");
+  const blockedReadinessRows = productionReadiness.filter((item) => item.stage !== "Draft package" && item.stage !== "Context anchor");
+  const criticalRequests = requestPackets.filter((item) => item.priority === "Critical");
+  const criticalLedgerRows = sourceCopyLedger.filter((item) => item.priority === "Critical");
+  const blockedAnnotations = annotationQueue.filter((item) => /request-blocked|verify first|citation review|authority check|boundary check/i.test(item.status));
+  const criticalGaps = gapTracker.filter((gap) => gap.priority === "Critical");
+  const personsNeedingReview = persons.filter((person) => person.needsReview);
+
+  return [
+    "FRUS 1981-1988 Volume XXXVII work queue",
+    `Copied: ${new Date().toISOString().slice(0, 10)}`,
+    `Official volume: ${volumeConfig.url || "https://history.state.gov/historicaldocuments/frus1981-88v37"}`,
+    "",
+    ...packetSection("Draft packages that can move", draftReadyRows, (item) => `${item.id} ${item.title} (${item.lane}) - ${item.nextAction}`),
+    "",
+    ...packetSection("Production blockers", blockedReadinessRows, (item) => `${item.id} ${item.stage}/${item.priority}: ${item.title} - Blocker: ${item.blocker} Next: ${item.nextAction}`),
+    "",
+    ...packetSection("Critical archive asks", criticalRequests, (item) => `${item.repository}: ${item.title} - ${item.exactAsk}`),
+    "",
+    ...packetSection("Critical source-copy checks", criticalLedgerRows, (item) => `${item.issueType}: ${item.title} - ${item.action}`),
+    "",
+    ...packetSection("Annotation blockers", blockedAnnotations, (item) => `${item.id} ${item.status}: ${item.target} - Verify: ${item.verificationNeeded}`),
+    "",
+    ...packetSection("Critical gaps", criticalGaps, (gap) => `${gap.title} (${gap.lane}) - ${gap.needed}`),
+    "",
+    ...packetSection("Boundary reminders", boundaryRecords, (record) => `${record.compilerNumber} ${record.title} - ${record.boundaryReason}`),
+    "",
+    ...packetSection("Persons review queue", personsNeedingReview, (person) => `${person.displayName || person.entry} - ${person.reviewReason || "Normalize before final copy."}`)
+  ].join("\n");
+}
+
+function estimatedSelectionPages(item) {
+  if (Number.isFinite(item.budgetPages)) return item.budgetPages;
+  if (item.status === "Request-first") return 90;
+  if (item.status === "Draft candidate") return 6;
+  if (item.status === "Context anchor") return 1;
+  return 0;
+}
+
+function pageBudgetRows() {
+  const targets = pageBudget.laneTargets || [];
+  return targets.map((target, index) => {
+    const selectionPages = selectionBoard
+      .filter((item) => item.lane === target.lane)
+      .reduce((sum, item) => sum + estimatedSelectionPages(item), 0);
+    const currentAllowance = Number.isFinite(target.currentAllowance) ? target.currentAllowance : selectionPages;
+    const remaining = Math.max(0, target.targetPages - currentAllowance);
+    const percent = target.targetPages ? Math.min(100, Math.round((currentAllowance / target.targetPages) * 100)) : 0;
+    return {
+      budgetId: `PB-${String(index + 1).padStart(3, "0")}`,
+      lane: target.lane,
+      targetPages: target.targetPages || 0,
+      currentAllowance,
+      selectionPages,
+      remaining,
+      percent,
+      rule: target.rule || ""
+    };
+  });
+}
+
+function renderPageBudget() {
+  const rows = pageBudgetRows();
+  const totalPages = pageBudget.totalPages || 1400;
+  const documentTarget = pageBudget.documentTargetPages || rows.reduce((sum, row) => sum + row.targetPages, 0);
+  const currentAllowance = rows.reduce((sum, row) => sum + row.currentAllowance, 0);
+  const remaining = Math.max(0, documentTarget - currentAllowance);
+  const reserve = pageBudget.apparatusReservePages || Math.max(0, totalPages - documentTarget);
+  nodes.pageBudgetSummary.textContent = `${currentAllowance} working document pages allocated against a ${documentTarget}-page document target, with ${reserve} pages reserved for apparatus inside the ${totalPages}-page cap. ${remaining} document pages remain unallocated.`;
+  nodes.pageBudgetRoot.replaceChildren(...rows.map(pageBudgetCard), pageBudgetRulesCard());
+}
+
+function pageBudgetCard(row) {
+  const card = document.createElement("article");
+  card.className = `file-card budget-card ${row.currentAllowance > row.targetPages ? "over-budget" : ""}`;
+  const header = document.createElement("header");
+  const titleBlock = document.createElement("div");
+  const meta = document.createElement("div");
+  meta.className = "file-meta";
+  meta.append(textSpan(row.budgetId), textSpan(`${row.currentAllowance}/${row.targetPages} pages`));
+  const title = document.createElement("h3");
+  title.textContent = row.lane;
+  titleBlock.append(meta, title);
+  header.append(titleBlock);
+
+  const bar = document.createElement("div");
+  bar.className = "budget-bar";
+  const fill = document.createElement("span");
+  fill.style.width = `${row.percent}%`;
+  bar.append(fill);
+
+  const detail = document.createElement("p");
+  detail.textContent = `${row.remaining} pages remain in this lane target. Current selection rows imply about ${row.selectionPages} pages before request-first lane allowances.`;
+  const rule = document.createElement("p");
+  rule.className = "source-note";
+  rule.textContent = row.rule;
+  card.append(header, chip(`${row.percent}% allocated`, row.currentAllowance > row.targetPages ? "warn" : "good"), bar, detail, rule);
+  return card;
+}
+
+function pageBudgetRulesCard() {
+  const card = document.createElement("article");
+  card.className = "file-card budget-card rules-card";
+  const title = document.createElement("h3");
+  title.textContent = "Selection Rules";
+  const reserve = document.createElement("p");
+  reserve.textContent = pageBudget.reserveRule || "Keep apparatus and late substitutions inside the full volume cap.";
+  const list = document.createElement("ul");
+  list.className = "action-list";
+  for (const rule of pageBudget.selectionRules || []) {
+    const item = document.createElement("li");
+    item.textContent = rule;
+    list.append(item);
+  }
+  card.append(title, reserve, list);
+  return card;
+}
+
+function pageBudgetBriefText() {
+  const rows = pageBudgetRows();
+  const totalPages = pageBudget.totalPages || 1400;
+  const documentTarget = pageBudget.documentTargetPages || rows.reduce((sum, row) => sum + row.targetPages, 0);
+  const currentAllowance = rows.reduce((sum, row) => sum + row.currentAllowance, 0);
+  return [
+    "FRUS 1981-1988 Volume XXXVII page budget",
+    `Cap: ${totalPages} pages`,
+    `Document target: ${documentTarget} pages`,
+    `Current working allowance: ${currentAllowance} pages`,
+    `Apparatus reserve: ${pageBudget.apparatusReservePages || Math.max(0, totalPages - documentTarget)} pages`,
+    "",
+    "Lane targets:",
+    ...rows.map((row) => `- ${row.lane}: ${row.currentAllowance}/${row.targetPages} pages; ${row.remaining} remaining. Rule: ${row.rule}`),
+    "",
+    "Selection rules:",
+    ...(pageBudget.selectionRules || []).map((rule) => `- ${rule}`)
+  ].join("\n");
 }
 
 function renderChapters() {
@@ -498,6 +1126,7 @@ function renderChapters() {
         state.records.chapter = chapter.name;
         nodes.chapterFilter.value = chapter.name;
         renderRecords();
+        syncUrlState("records");
       });
       return card;
     })
@@ -677,11 +1306,43 @@ function requestPacketCard(packet) {
   return card;
 }
 
+function requestBundleText() {
+  const visible = filteredRequestPackets().sort(packetSort);
+  const output = [
+    "FRUS Volume XXXVII archive request bundle",
+    `Copied: ${new Date().toISOString().slice(0, 10)}`,
+    `Filtered requests: ${visible.length} of ${requestPackets.length}`,
+    ""
+  ];
+
+  if (!visible.length) {
+    output.push("No archive request packets match the current filters.");
+    return output.join("\n");
+  }
+
+  for (const packet of visible) {
+    output.push(`${packet.priority} | ${packet.repository} | ${packet.title}`);
+    output.push(`Lane/window: ${packet.lane} | ${packet.sourceWindow}`);
+    output.push(`Request type: ${packet.requestType}`);
+    output.push(`Purpose: ${packet.purpose}`);
+    output.push(`Exact ask: ${packet.exactAsk}`);
+    if (packet.requestText) output.push(`Request text: ${packet.requestText}`);
+    if (packet.sourceNoteTarget) output.push(`Source-note target: ${packet.sourceNoteTarget}`);
+    output.push(`Next step: ${packet.nextStep}`);
+    if (packet.catalogUrl) output.push(`Source URL: ${packet.catalogUrl}`);
+    if (packet.pdfUrl) output.push(`PDF URL: ${packet.pdfUrl}`);
+    output.push("");
+  }
+
+  return output.join("\n").trimEnd();
+}
+
 function filteredSourceNoteAudit() {
   return sourceNoteAudit.filter((row) => {
     if (!matchesQuery(row, state.sourceNotes.query)) return false;
     if (state.sourceNotes.status && row.assessment !== state.sourceNotes.status) return false;
     if (state.sourceNotes.section && row.section !== state.sourceNotes.section) return false;
+    if (state.sourceNotes.format && row.formatFamily !== state.sourceNotes.format) return false;
     return true;
   });
 }
@@ -725,6 +1386,7 @@ function sourceNoteCard(row) {
   chips.className = "chips";
   chips.append(chip(row.assessment, row.assessment === "Needs review" ? "warn" : row.assessment === "Ready" ? "good" : "boundary"));
   chips.append(chip(row.lane));
+  chips.append(chip(row.formatFamily, row.assessment === "Needs review" ? "warn" : "boundary"));
   if (row.identifier) chips.append(chip(row.identifier));
 
   const note = document.createElement("p");
@@ -747,6 +1409,722 @@ function sourceNoteCard(row) {
 
   card.append(header, chips, note, flags, actions);
   return card;
+}
+
+function sourceNoteFixListText() {
+  const rows = filteredSourceNoteAudit()
+    .filter((row) => row.assessment === "Needs review" || row.assessment === "Target")
+    .sort(
+      (a, b) =>
+        a.assessment.localeCompare(b.assessment) ||
+        a.section.localeCompare(b.section) ||
+        a.sourceTitle.localeCompare(b.sourceTitle)
+    );
+  const output = [
+    "FRUS Volume XXXVII source-note fix list",
+    `Copied: ${new Date().toISOString().slice(0, 10)}`,
+    `Filtered rows: ${rows.length} of ${sourceNoteAudit.length} audited notes`,
+    ""
+  ];
+
+  if (!rows.length) {
+    output.push("No target or needs-review source notes match the current filters.");
+    return output.join("\n");
+  }
+
+  for (const row of rows) {
+    output.push(`${row.auditId} | ${row.assessment} | ${row.section} | ${row.sourceTitle}`);
+    output.push(`Lane/date/format: ${row.lane}${row.dateText ? ` | ${row.dateText}` : ""} | ${row.formatFamily}`);
+    if (row.identifier) output.push(`Identifier: ${row.identifier}`);
+    output.push(`Flags: ${(row.flags || []).join("; ") || "No flags recorded."}`);
+    output.push(`Source note: ${row.sourceNote}`);
+    if (row.requestText) output.push(`Request text: ${row.requestText}`);
+    if (row.catalogUrl) output.push(`Source URL: ${row.catalogUrl}`);
+    if (row.pdfUrl) output.push(`PDF URL: ${row.pdfUrl}`);
+    output.push("");
+  }
+
+  return output.join("\n").trimEnd();
+}
+
+function sourcePrecedentProfile(row) {
+  const family = row.formatFamily;
+  if (family === "NARA RG 56") {
+    return {
+      precedentModel: "Volume III RG 56 Treasury record",
+      officialModel: "FRUS 1977-1980 Volume III source list and Document 258, note 1",
+      sourceListUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/sources",
+      exampleUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/d258",
+      expectedShape: "Source: National Archives, RG 56, Records of [Treasury office/series], Box [number], [folder]. [Classification/handling]. [Review, routing, copy, or notation sentence when present]."
+    };
+  }
+  if (family === "NARA RG 59") {
+    return {
+      precedentModel: "Volume III RG 59 State central/lot file",
+      officialModel: "FRUS 1977-1980 Volume III source list",
+      sourceListUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/sources",
+      exampleUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/sources",
+      expectedShape: "Source: National Archives, RG 59, [Central Foreign Policy File document number OR office lot-file title], [lot/accession if applicable], Box [number], [folder]. [Classification/handling]."
+    };
+  }
+  if (family === "NARA RG 364") {
+    return {
+      precedentModel: "Volume III RG 364 trade representative files",
+      officialModel: "FRUS 1977-1980 Volume III source list",
+      sourceListUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/sources",
+      exampleUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/sources",
+      expectedShape: "Source: National Archives, RG 364, [Trade Representative records/subject files], [accession or series], Box [number], [folder]. [Classification/handling]. [Drafting, attachment, or signature note when present]."
+    };
+  }
+  if (family === "Reagan Library") {
+    return {
+      precedentModel: "Volume XXXVIII Reagan Library staff-file note",
+      officialModel: "FRUS 1981-1988 Volume XXXVIII source list and Danzansky document notes",
+      sourceListUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/sources",
+      exampleUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/d355",
+      expectedShape: "Source: Reagan Library, [staff or NSC collection], [series or outline], [folder]; [NLR/control number when available]. [Classification/handling]. [Meeting place, drafting, routing, copy, or notation sentence when present]."
+    };
+  }
+  if (family === "Public Papers") {
+    return {
+      precedentModel: "Published Public Papers endpoint",
+      officialModel: "FRUS 1981-1988 Volume XXXVIII public-source cross-reference practice",
+      sourceListUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/sources",
+      exampleUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/d191",
+      expectedShape: "Source: Public Papers: Reagan, [year], Book [I/II when applicable], pp. [page range]. Use as endpoint or cross-reference unless paired with an internal archival source."
+    };
+  }
+  if (family === "Daily Diary") {
+    return {
+      precedentModel: "Presidential Daily Diary cross-reference",
+      officialModel: "Volume III and Volume XXXVIII source lists include Presidential Daily Diary holdings",
+      sourceListUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/sources",
+      exampleUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/d26",
+      expectedShape: "Cross-reference target: Reagan Library, President Reagan's Daily Diary, [date]. Use for time, place, attendees, and no-memorandum checks unless the diary itself is selected."
+    };
+  }
+  if (family === "Reference") {
+    return {
+      precedentModel: "Adjacent FRUS reference control",
+      officialModel: "History.state.gov adjacent-volume references",
+      sourceListUrl: "https://history.state.gov/historicaldocuments/reagan",
+      exampleUrl: row.catalogUrl || "https://history.state.gov/historicaldocuments/reagan",
+      expectedShape: "Foreign Relations of the United States, [years], Volume [number], [title]. Use as boundary evidence, not as a selected-document source note."
+    };
+  }
+  return {
+    precedentModel: "Unmapped source-note family",
+    officialModel: "Manual editor review required",
+    sourceListUrl: volumeConfig.url || "https://history.state.gov/historicaldocuments/frus1981-88v37",
+    exampleUrl: volumeConfig.url || "https://history.state.gov/historicaldocuments/frus1981-88v37",
+    expectedShape: "Normalize against the closest published FRUS source note before final copy."
+  };
+}
+
+function sourcePrecedentFailures(row, profile) {
+  const note = row.sourceNote || "";
+  const failures = [];
+  const isTarget = note.startsWith("Source-note target:");
+  const isSource = note.startsWith("Source:");
+  const hasPlaceholder = /\[[^\]]+\]/.test(note);
+  const hasClassification = /\b(Top Secret|Secret|Confidential|No classification marking|Limited Official Use|Unclassified)\./i.test(note);
+
+  if (hasPlaceholder) failures.push("Resolve bracket placeholders before final copy.");
+  if (!/[.!?]$/.test(note.trim())) failures.push("Add final punctuation.");
+
+  if (profile.precedentModel.includes("RG 56")) {
+    if (!isSource && !isTarget) failures.push("Use Source or Source-note target prefix.");
+    if (!/National Archives,\s*RG 56/i.test(note)) failures.push("Identify National Archives, RG 56.");
+    if (!/Records of/i.test(note)) failures.push("Name the Treasury records series or office.");
+    if (!/\bBox\s+\d+/i.test(note) && !isTarget) failures.push("Add exact box number.");
+    if (!hasClassification && !isTarget) failures.push("Add classification or handling sentence.");
+  } else if (profile.precedentModel.includes("RG 59")) {
+    if (!/National Archives,\s*RG 59/i.test(note)) failures.push("Identify National Archives, RG 59.");
+    if (!/Central Foreign Policy File|Lot \d|Office of|Secretariat Staff/i.test(note)) failures.push("Separate Central Foreign Policy File document numbers from lot-file citations.");
+    if (!/\bBox\s+\d+/i.test(note) && !/Central Foreign Policy File,\s*[A-Z]\d/i.test(note) && !isTarget) failures.push("Add box/folder or CFPF document-number detail.");
+  } else if (profile.precedentModel.includes("RG 364")) {
+    if (!/National Archives,\s*RG 364/i.test(note)) failures.push("Identify National Archives, RG 364.");
+    if (!/Trade Representative|United States Trade Representative|Subject Files/i.test(note)) failures.push("Name the USTR/STR records or subject-file series.");
+    if (!/\bBox\s+\d+/i.test(note) && !isTarget) failures.push("Add exact box number.");
+    if (!hasClassification && !isTarget) failures.push("Add classification or handling sentence.");
+  } else if (profile.precedentModel.includes("Reagan Library")) {
+    if (!/Reagan Library/i.test(note)) failures.push("Identify Reagan Library repository.");
+    if (!/Files|Executive Secretariat|NSC|WHORM|Baker|Danzansky|Sprinkel|Farrar/i.test(note)) failures.push("Name the collection or staff-file lane.");
+    if (!/NLR|Box|RAC Box|OA\s+\d+/i.test(note) && !isTarget) failures.push("Add NLR, box, RAC box, or OA control.");
+    if (!hasClassification && !isTarget) failures.push("Add classification or no-classification line.");
+    if (!/No drafting information|Sent for|Copies? (?:were|was) sent|meeting took place|stamped notation|written at the top|approved|not approve|not disapprove/i.test(note) && !isTarget) {
+      failures.push("Add document-level drafting, routing, meeting, copy, or notation context if visible.");
+    }
+  } else if (profile.precedentModel.includes("Public Papers")) {
+    if (!/^Source: Public Papers: Reagan, \d{4}, (?:Book [IVX]+, )?pp\. \d/i.test(note)) {
+      failures.push("Use FRUS short form: Source: Public Papers: Reagan, [year], [Book], pp. [pages].");
+    }
+    if (!/\bpp\.\s*\d/i.test(note)) failures.push("Add page range.");
+  } else if (profile.precedentModel.includes("Daily Diary")) {
+    if (!/^Cross-reference target: Reagan Library, President Reagan's Daily Diary,/i.test(note)) {
+      failures.push("Keep Daily Diary rows as cross-reference targets unless selecting the diary itself.");
+    }
+  } else if (profile.precedentModel.includes("Adjacent FRUS")) {
+    if (/^Source:/i.test(note)) failures.push("Use adjacent FRUS volumes as boundary references, not Source notes.");
+  }
+
+  return [...new Set([...(row.flags || []), ...failures])];
+}
+
+function sourcePrecedentStatus(row, failures) {
+  if (row.assessment === "Reference") return "Reference control";
+  if (row.assessment === "Target" || row.sourceNote.startsWith("Source-note target:")) return "Target only";
+  if (failures.length || row.assessment === "Needs review") return "Needs repair";
+  if (row.assessment === "Ready") return "Matches precedent";
+  return "Manual review";
+}
+
+function sourcePrecedentNextAction(row) {
+  if (row.matchStatus === "Matches precedent") return "Keep as candidate copy, but verify against source image before final publication.";
+  if (row.matchStatus === "Target only") return "Do not publish with Source prefix until exact repository, series, box/folder, document, and handling data are verified.";
+  if (row.matchStatus === "Reference control") return "Use for boundary, cross-reference, or adjacent-volume routing rather than selected-document source copy.";
+  return "Repair the source note against the official precedent model before moving this row into draft copy.";
+}
+
+function buildSourcePrecedentRows() {
+  return sourceNoteAudit.map((row, index) => {
+    const profile = sourcePrecedentProfile(row);
+    const failures = sourcePrecedentFailures(row, profile);
+    const matchStatus = sourcePrecedentStatus(row, failures);
+    const precedentRow = {
+      ...row,
+      precedentId: `SP-${String(index + 1).padStart(3, "0")}`,
+      matchStatus,
+      precedentModel: profile.precedentModel,
+      officialModel: profile.officialModel,
+      sourceListUrl: profile.sourceListUrl,
+      exampleUrl: profile.exampleUrl,
+      expectedShape: profile.expectedShape,
+      repairActions: failures
+    };
+    precedentRow.nextAction = sourcePrecedentNextAction(precedentRow);
+    return precedentRow;
+  });
+}
+
+function sourcePrecedentStatusRank(status) {
+  return {
+    "Needs repair": 1,
+    "Target only": 2,
+    "Manual review": 3,
+    "Reference control": 4,
+    "Matches precedent": 5
+  }[status] || 9;
+}
+
+function sourcePrecedentSort(a, b) {
+  return (
+    sourcePrecedentStatusRank(a.matchStatus) - sourcePrecedentStatusRank(b.matchStatus) ||
+    (a.precedentModel || "").localeCompare(b.precedentModel || "") ||
+    (a.section || "").localeCompare(b.section || "") ||
+    (a.sourceTitle || "").localeCompare(b.sourceTitle || "")
+  );
+}
+
+function filteredSourcePrecedentRows() {
+  return sourcePrecedentRows.filter((row) => {
+    if (!matchesQuery(row, state.sourcePrecedents.query)) return false;
+    if (state.sourcePrecedents.status && row.matchStatus !== state.sourcePrecedents.status) return false;
+    if (state.sourcePrecedents.family && row.formatFamily !== state.sourcePrecedents.family) return false;
+    if (state.sourcePrecedents.precedent && row.precedentModel !== state.sourcePrecedents.precedent) return false;
+    return true;
+  });
+}
+
+function renderSourcePrecedents() {
+  const visible = filteredSourcePrecedentRows().sort(sourcePrecedentSort);
+  const counts = topCounts(sourcePrecedentRows, (row) => row.matchStatus)
+    .map(([label, count]) => `${count} ${label.toLowerCase()}`)
+    .join("; ");
+  nodes.sourcePrecedentSummary.textContent = `${plural(visible.length, "precedent row")} visible from ${sourcePrecedentRows.length} source-note precedent checks. ${counts}.`;
+  nodes.sourcePrecedentRoot.replaceChildren(...visible.map(sourcePrecedentCard));
+  if (!visible.length) nodes.sourcePrecedentRoot.innerHTML = '<p class="empty">No precedent rows match the current filters.</p>';
+}
+
+function sourcePrecedentCard(row) {
+  const card = document.createElement("article");
+  card.className = `file-card source-precedent-card status-${slug(row.matchStatus)}`;
+
+  const header = document.createElement("header");
+  const titleBlock = document.createElement("div");
+  const meta = document.createElement("div");
+  meta.className = "file-meta";
+  meta.append(textSpan(row.precedentId), textSpan(row.matchStatus), textSpan(row.formatFamily));
+  const title = document.createElement("h3");
+  title.textContent = row.sourceTitle;
+  titleBlock.append(meta, title);
+  header.append(titleBlock);
+
+  const chips = document.createElement("div");
+  chips.className = "chips";
+  chips.append(chip(row.precedentModel, row.matchStatus === "Needs repair" ? "warn" : row.matchStatus === "Matches precedent" ? "good" : "boundary"));
+  chips.append(chip(row.section));
+  if (row.identifier) chips.append(chip(row.identifier));
+
+  const model = document.createElement("p");
+  model.textContent = row.officialModel;
+  const expected = document.createElement("p");
+  expected.className = "source-note";
+  expected.textContent = `Expected shape: ${row.expectedShape}`;
+  const note = document.createElement("p");
+  note.className = "source-note";
+  note.textContent = row.sourceNote;
+  const actionsNeeded = briefList("Repair / verification actions", row.repairActions.length ? row.repairActions : ["No format repair flagged; verify against source image before publication."]);
+  const next = document.createElement("p");
+  next.className = "source-note";
+  next.textContent = `Next action: ${row.nextAction}`;
+
+  const actions = document.createElement("div");
+  actions.className = "file-actions";
+  if (row.sourceListUrl) actions.append(linkButton("Source list", row.sourceListUrl));
+  if (row.exampleUrl) actions.append(linkButton("Example", row.exampleUrl));
+  actions.append(copyButton(sourcePrecedentMemo(row), "Copy precedent memo"));
+
+  card.append(header, chips, model, expected, note, actionsNeeded, next, actions);
+  return card;
+}
+
+function sourcePrecedentMemo(row) {
+  return [
+    `${row.precedentId}: ${row.sourceTitle}`,
+    `Status: ${row.matchStatus}`,
+    `Family/model: ${row.formatFamily} | ${row.precedentModel}`,
+    `Official model: ${row.officialModel}`,
+    `Section/lane: ${row.section} | ${row.lane}`,
+    "",
+    `Expected shape: ${row.expectedShape}`,
+    "",
+    `Current note: ${row.sourceNote}`,
+    "",
+    "Repair / verification actions:",
+    ...(row.repairActions.length ? row.repairActions : ["No format repair flagged; verify against source image before publication."]).map((item) => `- ${item}`),
+    "",
+    `Next action: ${row.nextAction}`,
+    `Source list: ${row.sourceListUrl}`,
+    `Example: ${row.exampleUrl}`
+  ].join("\n");
+}
+
+function sourcePrecedentChecklistText() {
+  const visible = filteredSourcePrecedentRows().sort(sourcePrecedentSort);
+  const output = [
+    "FRUS Volume XXXVII source-note precedent checklist",
+    `Copied: ${new Date().toISOString().slice(0, 10)}`,
+    `Filtered precedent rows: ${visible.length} of ${sourcePrecedentRows.length}`,
+    ""
+  ];
+
+  if (!visible.length) {
+    output.push("No source-note precedent rows match the current filters.");
+    return output.join("\n");
+  }
+
+  for (const row of visible) {
+    output.push(`${row.precedentId} | ${row.matchStatus} | ${row.precedentModel} | ${row.sourceTitle}`);
+    output.push(`Section/lane/family: ${row.section} | ${row.lane} | ${row.formatFamily}`);
+    output.push(`Expected shape: ${row.expectedShape}`);
+    output.push(`Current note: ${row.sourceNote}`);
+    output.push(`Repair actions: ${row.repairActions.length ? row.repairActions.join("; ") : "No format repair flagged; verify source image."}`);
+    output.push(`Next action: ${row.nextAction}`);
+    output.push(`Source list: ${row.sourceListUrl}`);
+    output.push(`Example: ${row.exampleUrl}`);
+    output.push("");
+  }
+
+  return output.join("\n").trimEnd();
+}
+
+function buildSourceCoverageRows() {
+  const map = new Map();
+  for (const row of sourceNoteAudit) {
+    const key = `${row.lane}::${row.formatFamily}`;
+    if (!map.has(key)) {
+      map.set(key, {
+        lane: row.lane,
+        formatFamily: row.formatFamily,
+        total: 0,
+        ready: 0,
+        target: 0,
+        needsReview: 0,
+        reference: 0,
+        sectionsSet: new Set(),
+        sampleTitles: []
+      });
+    }
+    const coverage = map.get(key);
+    coverage.total += 1;
+    if (row.assessment === "Ready") coverage.ready += 1;
+    if (row.assessment === "Target") coverage.target += 1;
+    if (row.assessment === "Needs review") coverage.needsReview += 1;
+    if (row.assessment === "Reference") coverage.reference += 1;
+    coverage.sectionsSet.add(row.section);
+    if (coverage.sampleTitles.length < 3 && (row.assessment === "Needs review" || row.assessment === "Target")) {
+      coverage.sampleTitles.push(row.sourceTitle);
+    }
+  }
+
+  return [...map.values()]
+    .map((row, index) => {
+      const normalized = {
+        ...row,
+        coverageId: `SC-${String(index + 1).padStart(3, "0")}`,
+        sections: [...row.sectionsSet].sort((a, b) => a.localeCompare(b)).join("; ")
+      };
+      delete normalized.sectionsSet;
+      normalized.risk = sourceCoverageRisk(normalized);
+      normalized.nextAction = sourceCoverageNextAction(normalized);
+      return normalized;
+    })
+    .sort(sourceCoverageSort)
+    .map((row, index) => ({ ...row, coverageId: `SC-${String(index + 1).padStart(3, "0")}` }));
+}
+
+function sourceCoverageRisk(row) {
+  if (row.formatFamily === "Public Papers" && row.needsReview > 0) return "Published citation repair";
+  if (/^NARA/.test(row.formatFamily) && row.target > 0 && row.ready === 0) return "Archive target";
+  if (row.needsReview > row.ready) return "Citation repair";
+  if (row.ready === 0 && row.target > 0) return "Request-first";
+  if (row.reference === row.total) return "Boundary/reference";
+  return "Usable source base";
+}
+
+function sourceCoverageNextAction(row) {
+  if (row.formatFamily === "Public Papers" && row.needsReview > 0) {
+    return "Normalize to FRUS Public Papers short form with year, book where applicable, and page range.";
+  }
+  if (/^NARA/.test(row.formatFamily) && row.target > 0) {
+    return "Keep as target until exact series/accession, box, folder, document, and classification data are verified.";
+  }
+  if (row.formatFamily === "Reagan Library" && row.needsReview > 0) {
+    return "Verify document-level control, NLR/routing context, attachments, and classification before final source note.";
+  }
+  if (row.target > 0) return "Convert target rows to document-level source notes after source pulls.";
+  if (row.ready > 0) return "Use ready rows only after final source-image check.";
+  return "Use as a boundary or reference control rather than a selected-document source note.";
+}
+
+function sourceCoverageSort(a, b) {
+  return (
+    sourceCoverageRiskRank(a.risk) - sourceCoverageRiskRank(b.risk) ||
+    (a.lane || "").localeCompare(b.lane || "") ||
+    (a.formatFamily || "").localeCompare(b.formatFamily || "")
+  );
+}
+
+function sourceCoverageRiskRank(risk) {
+  return {
+    "Archive target": 1,
+    "Published citation repair": 2,
+    "Citation repair": 3,
+    "Request-first": 4,
+    "Usable source base": 5,
+    "Boundary/reference": 6
+  }[risk] || 9;
+}
+
+function sourceCoverageStatusCount(row, status) {
+  return {
+    "Needs review": row.needsReview,
+    Target: row.target,
+    Ready: row.ready,
+    Reference: row.reference
+  }[status] || 0;
+}
+
+function filteredSourceCoverageRows() {
+  return sourceCoverageRows.filter((row) => {
+    if (!matchesQuery(row, state.sourceCoverage.query)) return false;
+    if (state.sourceCoverage.format && row.formatFamily !== state.sourceCoverage.format) return false;
+    if (state.sourceCoverage.status && sourceCoverageStatusCount(row, state.sourceCoverage.status) === 0) return false;
+    return true;
+  });
+}
+
+function renderSourceCoverage() {
+  const visible = filteredSourceCoverageRows().sort(sourceCoverageSort);
+  const totalNotes = visible.reduce((sum, row) => sum + row.total, 0);
+  const repairRows = visible.filter((row) => row.needsReview > 0 || row.target > 0).length;
+  const repairVerb = repairRows === 1 ? "needs" : "need";
+  nodes.sourceCoverageSummary.textContent = `${plural(visible.length, "coverage row")} covering ${plural(totalNotes, "source note")} from ${sourceCoverageRows.length} lane/format groups. ${plural(repairRows, "row")} still ${repairVerb} citation repair or archival conversion.`;
+  nodes.sourceCoverageRoot.replaceChildren(...visible.map(sourceCoverageCard));
+  if (!visible.length) nodes.sourceCoverageRoot.innerHTML = '<p class="empty">No source coverage rows match the current filters.</p>';
+}
+
+function sourceCoverageCard(row) {
+  const card = document.createElement("article");
+  card.className = `file-card coverage-card status-${slug(row.risk)}`;
+
+  const header = document.createElement("header");
+  const titleBlock = document.createElement("div");
+  const meta = document.createElement("div");
+  meta.className = "file-meta";
+  meta.append(textSpan(row.coverageId), textSpan(row.formatFamily), textSpan(row.risk));
+  const title = document.createElement("h3");
+  title.textContent = row.lane;
+  titleBlock.append(meta, title);
+  header.append(titleBlock);
+
+  const counts = document.createElement("dl");
+  counts.className = "coverage-counts";
+  for (const [label, value] of [
+    ["Total", row.total],
+    ["Ready", row.ready],
+    ["Target", row.target],
+    ["Review", row.needsReview],
+    ["Reference", row.reference]
+  ]) {
+    const group = document.createElement("div");
+    const term = document.createElement("dt");
+    term.textContent = label;
+    const detail = document.createElement("dd");
+    detail.textContent = value.toString();
+    group.append(term, detail);
+    counts.append(group);
+  }
+
+  const sections = document.createElement("p");
+  sections.className = "source-note";
+  sections.textContent = `Sections: ${row.sections}`;
+  const next = document.createElement("p");
+  next.className = "source-note";
+  next.textContent = `Next action: ${row.nextAction}`;
+  const samples = document.createElement("p");
+  samples.className = "source-note";
+  samples.textContent = `Examples: ${row.sampleTitles.length ? row.sampleTitles.join("; ") : "No repair examples in this group."}`;
+
+  const actions = document.createElement("div");
+  actions.className = "file-actions";
+  actions.append(copyButton(sourceCoverageMemo(row), "Copy coverage memo"));
+
+  card.append(header, counts, sections, next, samples, actions);
+  return card;
+}
+
+function sourceCoverageMemo(row) {
+  return [
+    `${row.coverageId}: ${row.lane} / ${row.formatFamily}`,
+    `Risk: ${row.risk}`,
+    `Counts: total ${row.total}; ready ${row.ready}; target ${row.target}; needs review ${row.needsReview}; reference ${row.reference}`,
+    `Sections: ${row.sections}`,
+    `Next action: ${row.nextAction}`,
+    `Examples: ${row.sampleTitles.length ? row.sampleTitles.join("; ") : "No repair examples in this group."}`
+  ].join("\n");
+}
+
+function sourceCoverageBriefText() {
+  const visible = filteredSourceCoverageRows().sort(sourceCoverageSort);
+  const output = [
+    "FRUS Volume XXXVII source coverage brief",
+    `Copied: ${new Date().toISOString().slice(0, 10)}`,
+    `Filtered coverage rows: ${visible.length} of ${sourceCoverageRows.length}`,
+    ""
+  ];
+
+  if (!visible.length) {
+    output.push("No source coverage rows match the current filters.");
+    return output.join("\n");
+  }
+
+  for (const row of visible) {
+    output.push(`${row.coverageId} | ${row.risk} | ${row.lane} | ${row.formatFamily}`);
+    output.push(`Counts: total ${row.total}; ready ${row.ready}; target ${row.target}; needs review ${row.needsReview}; reference ${row.reference}`);
+    output.push(`Sections: ${row.sections}`);
+    output.push(`Next action: ${row.nextAction}`);
+    if (row.sampleTitles.length) output.push(`Examples: ${row.sampleTitles.join("; ")}`);
+    output.push("");
+  }
+
+  return output.join("\n").trimEnd();
+}
+
+function buildDateControlRows() {
+  return records
+    .filter(needsDateControl)
+    .sort(byChapterThenDate)
+    .map((record, index) => {
+      const row = {
+        controlId: `DC-${String(index + 1).padStart(3, "0")}`,
+        lane: record.chapter?.name || "Unassigned",
+        priority: dateControlPriority(record),
+        dateText: record.dateText || record.date || "",
+        sortDate: record.sortDate || record.date || "",
+        title: record.title,
+        sourceType: record.type,
+        country: record.country,
+        participants: record.participants || [],
+        catalogUrl: record.catalogUrl,
+        pdfUrl: record.pdfUrl,
+        sourceNote: preferredSourceNote(record),
+        publicAnchor: /Public Papers/i.test(record.type || record.source?.series || ""),
+        controlType: dateControlType(record),
+        dateRisk: dateControlRisk(record),
+        diaryAsk: dateControlAsk(record),
+        internalBridge: dateControlBridge(record)
+      };
+      return row;
+    });
+}
+
+function needsDateControl(record) {
+  const text = [record.title, record.type, record.counterpart, record.chapter?.name, record.notes, (record.participants || []).join(" ")].join(" ");
+  return /Public Papers|Summit|G-7|G-5|news conference|statement|radio address|Mulroney|Nakasone|Thatcher|Kohl|Mitterrand|Takeshita|Baker|Brady|Volcker|Greenspan|Powell|Sprinkel|Diary/i.test(text);
+}
+
+function dateControlPriority(record) {
+  const text = [record.title, record.type, record.counterpart, record.chapter?.name].join(" ");
+  if (/Toronto|NSDD 297|Plaza|Louvre|G-5|G-7|foreign exchange|Summit Group/i.test(text)) return "Critical";
+  if (/Summit|Canada Free Trade|Grain|NSDD|News Conference/i.test(text)) return "High";
+  return "Medium";
+}
+
+function dateControlType(record) {
+  const text = [record.title, record.type, record.counterpart].join(" ");
+  if (/Public Papers|radio address|statement|news conference|declaration|remarks/i.test(text)) return "Public endpoint";
+  if (/NSDD|directive/i.test(text)) return "Directive anchor";
+  if (/memorandum|report|folder PDF/i.test(text)) return "Internal-file bridge";
+  return "Chronology control";
+}
+
+function dateControlRisk(record) {
+  const text = [record.title, record.type, record.counterpart, record.notes].join(" ");
+  if (/Public Papers|radio address|statement|news conference|declaration|remarks/i.test(text)) {
+    return "Public event needs Daily Diary time/location check before annotation or chronology reliance.";
+  }
+  if (/Summit|G-7|G-5|Toronto|Venice|Tokyo/i.test(text)) {
+    return "Summit record needs diary/date control for meetings, travel, calls, and participant context.";
+  }
+  if (/Grain|Canada|Japan|Soviet|Mulroney|Nakasone|Takeshita/i.test(text)) {
+    return "Bilateral or issue lead needs diary/contact check before treating it as a decision point.";
+  }
+  return "Date and participant context should be checked against the Presidential Daily Diary or backup schedule.";
+}
+
+function dateControlAsk(record) {
+  return `Check President Reagan's Daily Diary and backup schedule for ${record.dateText || record.date}: ${record.title}. Confirm time, location, participants, travel/call status, and whether a substantive memorandum exists.`;
+}
+
+function dateControlBridge(record) {
+  if (/Public Papers|radio address|statement|news conference|declaration|remarks/i.test([record.title, record.type].join(" "))) {
+    return "Use the public item as endpoint only; pair it with speech-clearance, NSC, State, Treasury, or USTR records before final selection.";
+  }
+  if (/NSDD|directive/i.test(record.type || "")) {
+    return "Use the diary as context only; source-copy work still needs NSDD attachments/background papers.";
+  }
+  return "Use the diary as corroboration; selected documentation still needs the substantive archival record.";
+}
+
+function dateControlSort(a, b) {
+  return (
+    priorityRank(a.priority) - priorityRank(b.priority) ||
+    (a.sortDate || "").localeCompare(b.sortDate || "") ||
+    (a.lane || "").localeCompare(b.lane || "") ||
+    (a.title || "").localeCompare(b.title || "")
+  );
+}
+
+function filteredDateControlRows() {
+  return dateControlRows.filter((row) => {
+    if (!matchesQuery(row, state.dateControls.query)) return false;
+    if (state.dateControls.lane && row.lane !== state.dateControls.lane) return false;
+    if (state.dateControls.priority && row.priority !== state.dateControls.priority) return false;
+    return true;
+  });
+}
+
+function renderDateControls() {
+  const visible = filteredDateControlRows().sort(dateControlSort);
+  const critical = visible.filter((row) => row.priority === "Critical").length;
+  const publicAnchors = visible.filter((row) => row.publicAnchor).length;
+  nodes.dateControlSummary.textContent = `${plural(visible.length, "date-control row")} visible from ${dateControlRows.length} diary checks. ${plural(critical, "critical row")} and ${plural(publicAnchors, "public endpoint")} in this view.`;
+  nodes.dateControlRoot.replaceChildren(...visible.map(dateControlCard));
+  if (!visible.length) nodes.dateControlRoot.innerHTML = '<p class="empty">No date-control rows match the current filters.</p>';
+}
+
+function dateControlCard(row) {
+  const card = document.createElement("article");
+  card.className = `record-card date-control-card priority-${row.priority.toLowerCase()}`;
+
+  const header = document.createElement("header");
+  const titleBlock = document.createElement("div");
+  const meta = document.createElement("div");
+  meta.className = "record-id";
+  meta.append(textSpan(row.controlId), textSpan(row.dateText), textSpan(row.priority), textSpan(row.controlType));
+  const title = document.createElement("h4");
+  title.textContent = row.title;
+  titleBlock.append(meta, title);
+  const chips = document.createElement("div");
+  chips.className = "chips";
+  chips.append(chip(row.lane), chip(row.country), chip(row.publicAnchor ? "Public endpoint" : "Internal/source lead", row.publicAnchor ? "warn" : "boundary"));
+  header.append(titleBlock, chips);
+
+  const participants = document.createElement("p");
+  participants.textContent = row.participants.length ? row.participants.join(" / ") : "Participants not yet recorded.";
+  const risk = document.createElement("p");
+  risk.className = "source-note";
+  risk.textContent = `Risk: ${row.dateRisk}`;
+  const ask = document.createElement("p");
+  ask.className = "source-note";
+  ask.textContent = `Diary ask: ${row.diaryAsk}`;
+  const bridge = document.createElement("p");
+  bridge.className = "source-note";
+  bridge.textContent = `Bridge rule: ${row.internalBridge}`;
+
+  const actions = document.createElement("div");
+  actions.className = "record-actions";
+  actions.append(linkButton("Daily Diary", "https://www.reaganlibrary.gov/archives/reagans-daily-diary"));
+  if (row.catalogUrl) actions.append(linkButton("Source", row.catalogUrl));
+  if (row.pdfUrl) actions.append(linkButton("PDF", row.pdfUrl));
+  actions.append(copyButton(dateControlMemo(row), "Copy diary memo"));
+
+  card.append(header, participants, risk, ask, bridge, actions);
+  return card;
+}
+
+function dateControlMemo(row) {
+  return [
+    `${row.controlId}: ${row.title}`,
+    `Date/lane: ${row.dateText} | ${row.lane}`,
+    `Priority/type: ${row.priority} | ${row.controlType}`,
+    `Participants: ${row.participants.length ? row.participants.join("; ") : "Participants not yet recorded."}`,
+    `Risk: ${row.dateRisk}`,
+    `Diary ask: ${row.diaryAsk}`,
+    `Bridge rule: ${row.internalBridge}`,
+    `Source note: ${row.sourceNote || "No source note recorded."}`,
+    `Source URL: ${row.catalogUrl || "No source URL recorded."}`
+  ].join("\n");
+}
+
+function dateControlBriefText() {
+  const visible = filteredDateControlRows().sort(dateControlSort);
+  const output = [
+    "FRUS Volume XXXVII Daily Diary date-control brief",
+    `Copied: ${new Date().toISOString().slice(0, 10)}`,
+    `Filtered date-control rows: ${visible.length} of ${dateControlRows.length}`,
+    ""
+  ];
+
+  if (!visible.length) {
+    output.push("No date-control rows match the current filters.");
+    return output.join("\n");
+  }
+
+  for (const row of visible) {
+    output.push(`${row.controlId} | ${row.priority} | ${row.dateText} | ${row.lane} | ${row.title}`);
+    output.push(`Type: ${row.controlType} | Country: ${row.country}`);
+    output.push(`Participants: ${row.participants.length ? row.participants.join("; ") : "Participants not yet recorded."}`);
+    output.push(`Diary ask: ${row.diaryAsk}`);
+    output.push(`Bridge rule: ${row.internalBridge}`);
+    if (row.catalogUrl) output.push(`Source URL: ${row.catalogUrl}`);
+    if (row.pdfUrl) output.push(`PDF URL: ${row.pdfUrl}`);
+    output.push("");
+  }
+
+  return output.join("\n").trimEnd();
 }
 
 function filteredSourceNotePatterns() {
@@ -855,25 +2233,7 @@ function filteredSelectionBoard() {
 }
 
 function renderSelectionBoard() {
-  const statusOrder = new Map([
-    ["Draft candidate", 1],
-    ["Request-first", 2],
-    ["Context anchor", 3],
-    ["Boundary / exclude unless needed", 4]
-  ]);
-  const priorityOrder = new Map([
-    ["Critical", 1],
-    ["High", 2],
-    ["Medium", 3],
-    ["Low", 4]
-  ]);
-  const visible = filteredSelectionBoard().sort(
-    (a, b) =>
-      (statusOrder.get(a.status) || 99) - (statusOrder.get(b.status) || 99) ||
-      (priorityOrder.get(a.priority) || 99) - (priorityOrder.get(b.priority) || 99) ||
-      a.lane.localeCompare(b.lane) ||
-      a.title.localeCompare(b.title)
-  );
+  const visible = filteredSelectionBoard().sort(selectionSort);
   const counts = topCounts(selectionBoard, (item) => item.status)
     .map(([label, count]) => `${count} ${label.toLowerCase()}`)
     .join("; ");
@@ -941,6 +2301,43 @@ function selectionMemo(item) {
     `Annotation lead: ${item.annotationLead}`,
     `Source note: ${item.sourceNote}`
   ].join("\n");
+}
+
+function selectionDossierText() {
+  const visible = filteredSelectionBoard().sort(selectionSort);
+  const activeFilters = [
+    state.selections.status ? `status=${state.selections.status}` : "",
+    state.selections.lane ? `lane=${state.selections.lane}` : "",
+    state.selections.query ? `search=${state.selections.query}` : ""
+  ].filter(Boolean);
+  const output = [
+    "FRUS Volume XXXVII selection dossier",
+    `Copied: ${new Date().toISOString().slice(0, 10)}`,
+    `Filtered selections: ${visible.length} of ${selectionBoard.length}`,
+    `Filters: ${activeFilters.length ? activeFilters.join("; ") : "none"}`,
+    ""
+  ];
+
+  if (!visible.length) {
+    output.push("No selection rows match the current filters.");
+    return output.join("\n");
+  }
+
+  for (const item of visible) {
+    output.push(`${item.status} | ${item.priority} | ${item.recordId} | ${item.title}`);
+    output.push(`Lane/date: ${item.lane} | ${item.dateText}`);
+    output.push(`Source lead: ${item.sourceLead}`);
+    output.push(`Rationale: ${item.selectionRationale}`);
+    output.push(`Boundary risk: ${item.boundaryRisk}`);
+    output.push(`Next action: ${item.nextAction}`);
+    output.push(`Annotation lead: ${item.annotationLead}`);
+    if (item.sourceNote) output.push(`Source note: ${item.sourceNote}`);
+    if (item.catalogUrl) output.push(`Source URL: ${item.catalogUrl}`);
+    if (item.pdfUrl) output.push(`PDF URL: ${item.pdfUrl}`);
+    output.push("");
+  }
+
+  return output.join("\n").trimEnd();
 }
 
 function filteredProductionReadiness() {
@@ -1357,6 +2754,143 @@ function ledgerCard(item) {
   return card;
 }
 
+function inferRepository(item) {
+  const text = [item.repository, item.frusSourceNote, item.sourceNote, item.catalogUrl, item.pdfUrl].filter(Boolean).join(" ");
+  if (/Reagan Library|reaganlibrary\.gov/i.test(text)) return "Reagan Library";
+  if (/National Archives|NARA|archives\.gov|RG\s*\d+/i.test(text)) return "NARA.gov";
+  if (/Public Papers|govinfo/i.test(text)) return "Published";
+  return item.repository || "Unspecified";
+}
+
+function buildProvenanceRows() {
+  const sourceRows = [];
+  const add = (source, item, options = {}) => {
+    const pdfUrl = options.pdfUrl || item.pdfUrl || "";
+    const catalogUrl = options.catalogUrl || item.catalogUrl || item.sourceUrl || "";
+    const sourceNote = options.sourceNote || item.frusSourceNote || item.sourceNote || item.sourceNoteTarget || "";
+    if (!pdfUrl && !catalogUrl && !sourceNote) return;
+    sourceRows.push({
+      source,
+      title: options.title || item.title || item.target || item.workingTitle || "Untitled candidate",
+      dateText: options.dateText || item.dateText || item.date || item.sourceWindow || "",
+      lane: options.lane || item.lane || item.chapter?.name || item.chapter || "",
+      repository: options.repository || inferRepository(item),
+      priority: item.priority || "Medium",
+      status: options.status || item.issueType || item.status || item.stage || item.requestType || "Source lead",
+      identifier: options.identifier || item.identifier || item.recordId || item.compilerNumber || item.id || "",
+      releaseStatus: item.releaseStatus || item.sourceNoteStatus || item.copyStatus || "",
+      catalogLabel: options.catalogLabel || item.catalogLabel || item.sourceLabel || "Source",
+      catalogUrl,
+      pdfUrl,
+      sourceNote,
+      action: options.action || item.action || item.nextAction || item.nextStep || item.compilerMove || ""
+    });
+  };
+
+  for (const item of sourceCopyLedger) add("Source-copy ledger", item);
+  for (const item of requestPackets) add("Request packet", item, { sourceNote: item.sourceNoteTarget });
+  for (const item of selectionBoard) add("Selection board", item, { status: item.status });
+
+  const seen = new Set();
+  return sourceRows
+    .filter((row) => row.pdfUrl || /NARA|Reagan Library/i.test(row.repository))
+    .filter((row) => {
+      const key = [row.title, row.pdfUrl, row.catalogUrl, row.sourceNote].join("|");
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .map((row, index) => ({ ...row, provenanceId: `PV-${String(index + 1).padStart(3, "0")}` }));
+}
+
+function filteredProvenanceRows() {
+  return provenanceRows.filter((row) => {
+    if (!matchesQuery(row, state.provenance.query)) return false;
+    if (state.provenance.repository && row.repository !== state.provenance.repository) return false;
+    if (state.provenance.lane && row.lane !== state.provenance.lane) return false;
+    return true;
+  });
+}
+
+function renderProvenanceSheets() {
+  const visible = filteredProvenanceRows().sort(packetSort);
+  const pdfCount = visible.filter((row) => row.pdfUrl).length;
+  nodes.provenanceSummary.textContent = `${plural(visible.length, "provenance row")} visible from ${provenanceRows.length} candidate rows; ${pdfCount} have direct PDF URLs for sheet append checks.`;
+  nodes.provenanceRoot.replaceChildren(...visible.map(provenanceCard));
+  if (!visible.length) nodes.provenanceRoot.innerHTML = '<p class="empty">No provenance rows match the current filters.</p>';
+}
+
+function provenanceCard(row) {
+  const card = document.createElement("article");
+  card.className = `file-card provenance-card priority-${row.priority.toLowerCase()}`;
+  const header = document.createElement("header");
+  const titleBlock = document.createElement("div");
+  const meta = document.createElement("div");
+  meta.className = "file-meta";
+  meta.append(textSpan(row.provenanceId), textSpan(row.repository), textSpan(row.status));
+  const title = document.createElement("h3");
+  title.textContent = row.title;
+  titleBlock.append(meta, title);
+  header.append(titleBlock);
+
+  const instruction = document.createElement("p");
+  instruction.textContent = "Append the generated provenance sheet after the selected document pages. For folder PDFs, extract only the selected item pages and keep marker or withdrawal pages only when they document release status.";
+  const note = document.createElement("p");
+  note.className = "source-note";
+  note.textContent = row.sourceNote || "Source-note target still needs repository details before publication.";
+  const actions = document.createElement("div");
+  actions.className = "file-actions";
+  if (row.catalogUrl) actions.append(linkButton(row.catalogLabel || "Source", row.catalogUrl));
+  if (row.pdfUrl) actions.append(linkButton("PDF", row.pdfUrl));
+  actions.append(copyButton(provenanceSheetText(row), "Copy sheet"));
+
+  card.append(header, chip(row.lane || "Unassigned"), chip(row.pdfUrl ? "PDF candidate" : "Search lead", row.pdfUrl ? "good" : "warn"), instruction, note, actions);
+  return card;
+}
+
+function provenanceSheetText(row) {
+  return [
+    "FRUS 1981-1988 Volume XXXVII Potential Document Provenance Sheet",
+    "",
+    `Candidate ID: ${row.provenanceId}`,
+    `Candidate title: ${row.title}`,
+    `Working lane: ${row.lane || "Unassigned"}`,
+    `Date or source window: ${row.dateText || "Verify"}`,
+    `Repository: ${row.repository}`,
+    `Source row: ${row.source}`,
+    `Identifier: ${row.identifier || "Verify"}`,
+    `Release/copy status: ${row.releaseStatus || row.status || "Verify"}`,
+    "",
+    `Source URL: ${row.catalogUrl || "Verify in NARA Scout/NARA.gov/Reagan Library"}`,
+    `PDF URL: ${row.pdfUrl || "No direct PDF yet"}`,
+    "",
+    `FRUS source-note target: ${row.sourceNote || "Draft only after repository, series, box, folder, date, classification, and page span are verified."}`,
+    "",
+    "Selected document pages:",
+    "- Page span in source PDF: [fill before final packet]",
+    "- Page span in derivative packet: [fill before final packet]",
+    "- Attachments printed, omitted, or not found: [verify]",
+    "- Marker, cover, withdrawal, or release-status pages retained: [verify]",
+    "",
+    "Provenance checks:",
+    "- NARA Scout/NARA.gov Catalog search trail: [query/date/NAID or no-hit note]",
+    "- Reagan Library page or finding aid checked: [URL/date]",
+    "- Duplicate/source-copy relationship checked against adjacent FRUS volumes: [yes/no]",
+    "- Page-budget disposition under 1,400-page cap: [print / annotate / exclude / hold]",
+    "",
+    "PDF packet rule:",
+    "- Append this sheet after the selected document pages.",
+    "- Do not append unrelated folder pages just because they share a source PDF.",
+    "- Keep the formal FRUS source note free of derivative PDF page-map language."
+  ].join("\n");
+}
+
+function provenanceBundleText() {
+  const visible = filteredProvenanceRows().sort(packetSort);
+  if (!visible.length) return "No provenance rows match the current filters.";
+  return visible.map(provenanceSheetText).join("\n\n---\n\n");
+}
+
 function sourcePoolCard(pool) {
   const card = document.createElement("article");
   card.className = `file-card source-pool-card priority-${pool.priority.toLowerCase()}`;
@@ -1392,6 +2926,7 @@ function populateFilters() {
   addOptions(nodes.policyPriorityFilter, uniqueSorted(policyFiles.map((file) => file.priority)), "All priorities");
   addOptions(nodes.publicLaneFilter, uniqueSorted(publicReferences.map((item) => item.chapter)), "All lanes");
   addOptions(nodes.boundaryCountryFilter, uniqueSorted(boundaryRecords.map((record) => record.country)), "All countries");
+  addOptions(nodes.boundaryTypeFilter, uniqueSorted(boundaryRecords.map((record) => record.type)), "All row types");
   addOptions(nodes.selectionStatusFilter, uniqueSorted(selectionBoard.map((item) => item.status)), "All statuses");
   addOptions(nodes.selectionLaneFilter, uniqueSorted(selectionBoard.map((item) => item.lane)), "All lanes");
   addOptions(nodes.productionStageFilter, uniqueSorted(productionReadiness.map((item) => item.stage)), "All stages");
@@ -1411,12 +2946,22 @@ function populateFilters() {
   addOptions(nodes.requestPriorityFilter, uniqueSorted(requestPackets.map((packet) => packet.priority)), "All priorities");
   addOptions(nodes.sourceNoteStatusFilter, uniqueSorted(sourceNoteAudit.map((row) => row.assessment)), "All statuses");
   addOptions(nodes.sourceNoteSectionFilter, uniqueSorted(sourceNoteAudit.map((row) => row.section)), "All sections");
+  addOptions(nodes.sourceNoteFormatFilter, uniqueSorted(sourceNoteAudit.map((row) => row.formatFamily)), "All formats");
+  addOptions(nodes.sourceCoverageStatusFilter, ["Needs review", "Target", "Ready", "Reference"], "All statuses");
+  addOptions(nodes.sourceCoverageFormatFilter, uniqueSorted(sourceCoverageRows.map((row) => row.formatFamily)), "All formats");
+  addOptions(nodes.sourcePrecedentStatusFilter, uniqueSorted(sourcePrecedentRows.map((row) => row.matchStatus)), "All statuses");
+  addOptions(nodes.sourcePrecedentFamilyFilter, uniqueSorted(sourcePrecedentRows.map((row) => row.formatFamily)), "All families");
+  addOptions(nodes.sourcePrecedentModelFilter, uniqueSorted(sourcePrecedentRows.map((row) => row.precedentModel)), "All models");
+  addOptions(nodes.dateControlLaneFilter, uniqueSorted(dateControlRows.map((row) => row.lane)), "All lanes");
+  addOptions(nodes.dateControlPriorityFilter, uniqueSorted(dateControlRows.map((row) => row.priority)), "All priorities");
   addOptions(nodes.sourceNotePatternRepositoryFilter, uniqueSorted(sourceNotePatterns.map((pattern) => pattern.repository)), "All repositories");
   addOptions(nodes.sourceNotePatternLaneFilter, uniqueSorted(sourceNotePatterns.map((pattern) => pattern.lane)), "All lanes");
   addOptions(nodes.sourceNotePatternStatusFilter, uniqueSorted(sourceNotePatterns.map((pattern) => pattern.status)), "All statuses");
   addOptions(nodes.ledgerIssueFilter, uniqueSorted(sourceCopyLedger.map((item) => item.issueType)), "All issue types");
   addOptions(nodes.ledgerLaneFilter, uniqueSorted(sourceCopyLedger.map((item) => item.lane)), "All lanes");
   addOptions(nodes.ledgerPriorityFilter, uniqueSorted(sourceCopyLedger.map((item) => item.priority)), "All priorities");
+  addOptions(nodes.provenanceRepositoryFilter, uniqueSorted(provenanceRows.map((row) => row.repository)), "All repositories");
+  addOptions(nodes.provenanceLaneFilter, uniqueSorted(provenanceRows.map((row) => row.lane)), "All lanes");
 }
 
 function filteredRecords() {
@@ -1600,6 +3145,7 @@ function filteredBoundaryRecords() {
   return boundaryRecords.filter((record) => {
     if (!matchesQuery(record, state.boundary.query)) return false;
     if (state.boundary.country && record.country !== state.boundary.country) return false;
+    if (state.boundary.type && record.type !== state.boundary.type) return false;
     return true;
   });
 }
@@ -1649,16 +3195,54 @@ function formatExtent(item) {
   return "source lead";
 }
 
+function fallbackCopyText(text) {
+  const area = document.createElement("textarea");
+  area.value = text;
+  area.setAttribute("readonly", "");
+  area.style.position = "fixed";
+  area.style.left = "-9999px";
+  document.body.append(area);
+  area.select();
+  area.setSelectionRange(0, area.value.length);
+  try {
+    return document.execCommand("copy");
+  } finally {
+    area.remove();
+  }
+}
+
+async function writeClipboardText(value) {
+  const text = value || "";
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (error) {
+      // Fall through to the textarea copy path for static/local browser contexts.
+    }
+  }
+  return fallbackCopyText(text);
+}
+
 function copyButton(value, label = "Copy note") {
   const button = document.createElement("button");
   button.className = "copy-note";
   button.type = "button";
   button.textContent = label;
   button.addEventListener("click", async () => {
-    await navigator.clipboard.writeText(value || "");
-    button.textContent = "Copied";
+    let copied = false;
+    try {
+      copied = await writeClipboardText(value);
+    } catch (error) {
+      copied = false;
+    }
+    button.textContent = copied ? "Copied" : "Copy failed";
+    if (copied) button.dataset.copied = "true";
+    else button.dataset.copyFailed = "true";
     setTimeout(() => {
       button.textContent = label;
+      delete button.dataset.copied;
+      delete button.dataset.copyFailed;
     }, 1200);
   });
   return button;
@@ -1770,6 +3354,56 @@ function downloadCsv(filename, csv) {
 }
 
 function setupEvents() {
+  nodes.copyWorkbenchPacket.addEventListener("click", async () => {
+    const label = "Copy Work Queue";
+    let copied = false;
+    try {
+      copied = await writeClipboardText(workbenchPacketText());
+    } catch (error) {
+      copied = false;
+    }
+    nodes.copyWorkbenchPacket.textContent = copied ? "Copied" : "Copy failed";
+    if (copied) nodes.copyWorkbenchPacket.dataset.copied = "true";
+    else nodes.copyWorkbenchPacket.dataset.copyFailed = "true";
+    setTimeout(() => {
+      nodes.copyWorkbenchPacket.textContent = label;
+      delete nodes.copyWorkbenchPacket.dataset.copied;
+      delete nodes.copyWorkbenchPacket.dataset.copyFailed;
+    }, 1200);
+  });
+
+  nodes.copyPageBudgetBrief.addEventListener("click", async () => {
+    const label = "Copy Budget Brief";
+    let copied = false;
+    try {
+      copied = await writeClipboardText(pageBudgetBriefText());
+    } catch (error) {
+      copied = false;
+    }
+    nodes.copyPageBudgetBrief.textContent = copied ? "Copied" : "Copy failed";
+    if (copied) nodes.copyPageBudgetBrief.dataset.copied = "true";
+    else nodes.copyPageBudgetBrief.dataset.copyFailed = "true";
+    setTimeout(() => {
+      nodes.copyPageBudgetBrief.textContent = label;
+      delete nodes.copyPageBudgetBrief.dataset.copied;
+      delete nodes.copyPageBudgetBrief.dataset.copyFailed;
+    }, 1200);
+  });
+  nodes.exportPageBudget.addEventListener("click", () => {
+    downloadCsv(
+      "frus-volume37-page-budget.csv",
+      toCsv(pageBudgetRows(), [
+        { label: "Budget ID", value: (row) => row.budgetId },
+        { label: "Lane", value: (row) => row.lane },
+        { label: "Current Allowance", value: (row) => row.currentAllowance },
+        { label: "Target Pages", value: (row) => row.targetPages },
+        { label: "Selection Pages", value: (row) => row.selectionPages },
+        { label: "Remaining", value: (row) => row.remaining },
+        { label: "Rule", value: (row) => row.rule }
+      ])
+    );
+  });
+
   nodes.gapSearch.addEventListener("input", (event) => {
     state.gaps.query = event.target.value;
     renderGapTracker();
@@ -1864,6 +3498,23 @@ function setupEvents() {
     nodes.requestPriorityFilter.value = "";
     renderRequestPackets();
   });
+  nodes.copyRequestBundle.addEventListener("click", async () => {
+    const label = "Copy Bundle";
+    let copied = false;
+    try {
+      copied = await writeClipboardText(requestBundleText());
+    } catch (error) {
+      copied = false;
+    }
+    nodes.copyRequestBundle.textContent = copied ? "Copied" : "Copy failed";
+    if (copied) nodes.copyRequestBundle.dataset.copied = "true";
+    else nodes.copyRequestBundle.dataset.copyFailed = "true";
+    setTimeout(() => {
+      nodes.copyRequestBundle.textContent = label;
+      delete nodes.copyRequestBundle.dataset.copied;
+      delete nodes.copyRequestBundle.dataset.copyFailed;
+    }, 1200);
+  });
   nodes.exportRequests.addEventListener("click", () => {
     downloadCsv(
       "frus-volume37-request-packets.csv",
@@ -1898,12 +3549,34 @@ function setupEvents() {
     state.sourceNotes.section = event.target.value;
     renderSourceNoteAudit();
   });
+  nodes.sourceNoteFormatFilter.addEventListener("change", (event) => {
+    state.sourceNotes.format = event.target.value;
+    renderSourceNoteAudit();
+  });
   nodes.clearSourceNoteFilters.addEventListener("click", () => {
-    state.sourceNotes = { query: "", status: "", section: "" };
+    state.sourceNotes = { query: "", status: "", section: "", format: "" };
     nodes.sourceNoteSearch.value = "";
     nodes.sourceNoteStatusFilter.value = "";
     nodes.sourceNoteSectionFilter.value = "";
+    nodes.sourceNoteFormatFilter.value = "";
     renderSourceNoteAudit();
+  });
+  nodes.copySourceNoteFixes.addEventListener("click", async () => {
+    const label = "Fix List";
+    let copied = false;
+    try {
+      copied = await writeClipboardText(sourceNoteFixListText());
+    } catch (error) {
+      copied = false;
+    }
+    nodes.copySourceNoteFixes.textContent = copied ? "Copied" : "Copy failed";
+    if (copied) nodes.copySourceNoteFixes.dataset.copied = "true";
+    else nodes.copySourceNoteFixes.dataset.copyFailed = "true";
+    setTimeout(() => {
+      nodes.copySourceNoteFixes.textContent = label;
+      delete nodes.copySourceNoteFixes.dataset.copied;
+      delete nodes.copySourceNoteFixes.dataset.copyFailed;
+    }, 1200);
   });
   nodes.exportSourceNotes.addEventListener("click", () => {
     downloadCsv(
@@ -1912,6 +3585,7 @@ function setupEvents() {
         { label: "Audit ID", value: (row) => row.auditId },
         { label: "Status", value: (row) => row.assessment },
         { label: "Section", value: (row) => row.section },
+        { label: "Format", value: (row) => row.formatFamily },
         { label: "Lane", value: (row) => row.lane },
         { label: "Date", value: (row) => row.dateText },
         { label: "Title", value: (row) => row.sourceTitle },
@@ -1920,6 +3594,183 @@ function setupEvents() {
         { label: "Flags", value: (row) => (row.flags || []).join("; ") },
         { label: "Source URL", value: (row) => row.catalogUrl },
         { label: "PDF URL", value: (row) => row.pdfUrl }
+      ])
+    );
+  });
+
+  nodes.sourceCoverageSearch.addEventListener("input", (event) => {
+    state.sourceCoverage.query = event.target.value;
+    renderSourceCoverage();
+  });
+  nodes.sourceCoverageStatusFilter.addEventListener("change", (event) => {
+    state.sourceCoverage.status = event.target.value;
+    renderSourceCoverage();
+  });
+  nodes.sourceCoverageFormatFilter.addEventListener("change", (event) => {
+    state.sourceCoverage.format = event.target.value;
+    renderSourceCoverage();
+  });
+  nodes.clearSourceCoverageFilters.addEventListener("click", () => {
+    state.sourceCoverage = { query: "", status: "", format: "" };
+    nodes.sourceCoverageSearch.value = "";
+    nodes.sourceCoverageStatusFilter.value = "";
+    nodes.sourceCoverageFormatFilter.value = "";
+    renderSourceCoverage();
+  });
+  nodes.copySourceCoverageBrief.addEventListener("click", async () => {
+    const label = "Copy Brief";
+    let copied = false;
+    try {
+      copied = await writeClipboardText(sourceCoverageBriefText());
+    } catch (error) {
+      copied = false;
+    }
+    nodes.copySourceCoverageBrief.textContent = copied ? "Copied" : "Copy failed";
+    if (copied) nodes.copySourceCoverageBrief.dataset.copied = "true";
+    else nodes.copySourceCoverageBrief.dataset.copyFailed = "true";
+    setTimeout(() => {
+      nodes.copySourceCoverageBrief.textContent = label;
+      delete nodes.copySourceCoverageBrief.dataset.copied;
+      delete nodes.copySourceCoverageBrief.dataset.copyFailed;
+    }, 1200);
+  });
+  nodes.exportSourceCoverage.addEventListener("click", () => {
+    downloadCsv(
+      "frus-volume37-source-coverage.csv",
+      toCsv(filteredSourceCoverageRows(), [
+        { label: "Coverage ID", value: (row) => row.coverageId },
+        { label: "Risk", value: (row) => row.risk },
+        { label: "Lane", value: (row) => row.lane },
+        { label: "Format", value: (row) => row.formatFamily },
+        { label: "Total", value: (row) => row.total },
+        { label: "Ready", value: (row) => row.ready },
+        { label: "Target", value: (row) => row.target },
+        { label: "Needs Review", value: (row) => row.needsReview },
+        { label: "Reference", value: (row) => row.reference },
+        { label: "Sections", value: (row) => row.sections },
+        { label: "Next Action", value: (row) => row.nextAction },
+        { label: "Examples", value: (row) => row.sampleTitles.join("; ") }
+      ])
+    );
+  });
+
+  nodes.sourcePrecedentSearch.addEventListener("input", (event) => {
+    state.sourcePrecedents.query = event.target.value;
+    renderSourcePrecedents();
+  });
+  nodes.sourcePrecedentStatusFilter.addEventListener("change", (event) => {
+    state.sourcePrecedents.status = event.target.value;
+    renderSourcePrecedents();
+  });
+  nodes.sourcePrecedentFamilyFilter.addEventListener("change", (event) => {
+    state.sourcePrecedents.family = event.target.value;
+    renderSourcePrecedents();
+  });
+  nodes.sourcePrecedentModelFilter.addEventListener("change", (event) => {
+    state.sourcePrecedents.precedent = event.target.value;
+    renderSourcePrecedents();
+  });
+  nodes.clearSourcePrecedentFilters.addEventListener("click", () => {
+    state.sourcePrecedents = { query: "", status: "", family: "", precedent: "" };
+    nodes.sourcePrecedentSearch.value = "";
+    nodes.sourcePrecedentStatusFilter.value = "";
+    nodes.sourcePrecedentFamilyFilter.value = "";
+    nodes.sourcePrecedentModelFilter.value = "";
+    renderSourcePrecedents();
+  });
+  nodes.copySourcePrecedentChecklist.addEventListener("click", async () => {
+    const label = "Copy Checklist";
+    let copied = false;
+    try {
+      copied = await writeClipboardText(sourcePrecedentChecklistText());
+    } catch (error) {
+      copied = false;
+    }
+    nodes.copySourcePrecedentChecklist.textContent = copied ? "Copied" : "Copy failed";
+    if (copied) nodes.copySourcePrecedentChecklist.dataset.copied = "true";
+    else nodes.copySourcePrecedentChecklist.dataset.copyFailed = "true";
+    setTimeout(() => {
+      nodes.copySourcePrecedentChecklist.textContent = label;
+      delete nodes.copySourcePrecedentChecklist.dataset.copied;
+      delete nodes.copySourcePrecedentChecklist.dataset.copyFailed;
+    }, 1200);
+  });
+  nodes.exportSourcePrecedents.addEventListener("click", () => {
+    downloadCsv(
+      "frus-volume37-source-note-precedents.csv",
+      toCsv(filteredSourcePrecedentRows(), [
+        { label: "Precedent ID", value: (row) => row.precedentId },
+        { label: "Status", value: (row) => row.matchStatus },
+        { label: "Family", value: (row) => row.formatFamily },
+        { label: "Precedent Model", value: (row) => row.precedentModel },
+        { label: "Official Model", value: (row) => row.officialModel },
+        { label: "Section", value: (row) => row.section },
+        { label: "Lane", value: (row) => row.lane },
+        { label: "Title", value: (row) => row.sourceTitle },
+        { label: "Expected Shape", value: (row) => row.expectedShape },
+        { label: "Current Note", value: (row) => row.sourceNote },
+        { label: "Repair Actions", value: (row) => row.repairActions.join("; ") },
+        { label: "Next Action", value: (row) => row.nextAction },
+        { label: "Source List URL", value: (row) => row.sourceListUrl },
+        { label: "Example URL", value: (row) => row.exampleUrl }
+      ])
+    );
+  });
+
+  nodes.dateControlSearch.addEventListener("input", (event) => {
+    state.dateControls.query = event.target.value;
+    renderDateControls();
+  });
+  nodes.dateControlLaneFilter.addEventListener("change", (event) => {
+    state.dateControls.lane = event.target.value;
+    renderDateControls();
+  });
+  nodes.dateControlPriorityFilter.addEventListener("change", (event) => {
+    state.dateControls.priority = event.target.value;
+    renderDateControls();
+  });
+  nodes.clearDateControlFilters.addEventListener("click", () => {
+    state.dateControls = { query: "", lane: "", priority: "" };
+    nodes.dateControlSearch.value = "";
+    nodes.dateControlLaneFilter.value = "";
+    nodes.dateControlPriorityFilter.value = "";
+    renderDateControls();
+  });
+  nodes.copyDateControlBrief.addEventListener("click", async () => {
+    const label = "Copy Brief";
+    let copied = false;
+    try {
+      copied = await writeClipboardText(dateControlBriefText());
+    } catch (error) {
+      copied = false;
+    }
+    nodes.copyDateControlBrief.textContent = copied ? "Copied" : "Copy failed";
+    if (copied) nodes.copyDateControlBrief.dataset.copied = "true";
+    else nodes.copyDateControlBrief.dataset.copyFailed = "true";
+    setTimeout(() => {
+      nodes.copyDateControlBrief.textContent = label;
+      delete nodes.copyDateControlBrief.dataset.copied;
+      delete nodes.copyDateControlBrief.dataset.copyFailed;
+    }, 1200);
+  });
+  nodes.exportDateControls.addEventListener("click", () => {
+    downloadCsv(
+      "frus-volume37-date-controls.csv",
+      toCsv(filteredDateControlRows(), [
+        { label: "Control ID", value: (row) => row.controlId },
+        { label: "Priority", value: (row) => row.priority },
+        { label: "Lane", value: (row) => row.lane },
+        { label: "Date", value: (row) => row.dateText },
+        { label: "Title", value: (row) => row.title },
+        { label: "Type", value: (row) => row.controlType },
+        { label: "Country", value: (row) => row.country },
+        { label: "Participants", value: (row) => row.participants.join("; ") },
+        { label: "Risk", value: (row) => row.dateRisk },
+        { label: "Diary Ask", value: (row) => row.diaryAsk },
+        { label: "Bridge Rule", value: (row) => row.internalBridge },
+        { label: "Source URL", value: (row) => row.catalogUrl },
+        { label: "PDF URL", value: (row) => row.pdfUrl },
+        { label: "Source Note", value: (row) => row.sourceNote }
       ])
     );
   });
@@ -2014,6 +3865,63 @@ function setupEvents() {
     );
   });
 
+  nodes.provenanceSearch.addEventListener("input", (event) => {
+    state.provenance.query = event.target.value;
+    renderProvenanceSheets();
+  });
+  nodes.provenanceRepositoryFilter.addEventListener("change", (event) => {
+    state.provenance.repository = event.target.value;
+    renderProvenanceSheets();
+  });
+  nodes.provenanceLaneFilter.addEventListener("change", (event) => {
+    state.provenance.lane = event.target.value;
+    renderProvenanceSheets();
+  });
+  nodes.clearProvenanceFilters.addEventListener("click", () => {
+    state.provenance = { query: "", repository: "", lane: "" };
+    nodes.provenanceSearch.value = "";
+    nodes.provenanceRepositoryFilter.value = "";
+    nodes.provenanceLaneFilter.value = "";
+    renderProvenanceSheets();
+  });
+  nodes.copyProvenanceBundle.addEventListener("click", async () => {
+    const label = "Copy Sheets";
+    let copied = false;
+    try {
+      copied = await writeClipboardText(provenanceBundleText());
+    } catch (error) {
+      copied = false;
+    }
+    nodes.copyProvenanceBundle.textContent = copied ? "Copied" : "Copy failed";
+    if (copied) nodes.copyProvenanceBundle.dataset.copied = "true";
+    else nodes.copyProvenanceBundle.dataset.copyFailed = "true";
+    setTimeout(() => {
+      nodes.copyProvenanceBundle.textContent = label;
+      delete nodes.copyProvenanceBundle.dataset.copied;
+      delete nodes.copyProvenanceBundle.dataset.copyFailed;
+    }, 1200);
+  });
+  nodes.exportProvenance.addEventListener("click", () => {
+    downloadCsv(
+      "frus-volume37-provenance-sheets.csv",
+      toCsv(filteredProvenanceRows(), [
+        { label: "Provenance ID", value: (row) => row.provenanceId },
+        { label: "Repository", value: (row) => row.repository },
+        { label: "Lane", value: (row) => row.lane },
+        { label: "Date", value: (row) => row.dateText },
+        { label: "Title", value: (row) => row.title },
+        { label: "Identifier", value: (row) => row.identifier },
+        { label: "Status", value: (row) => row.status },
+        { label: "Release Status", value: (row) => row.releaseStatus },
+        { label: "Action", value: (row) => row.action },
+        { label: "Source URL", value: (row) => row.catalogUrl },
+        { label: "PDF URL", value: (row) => row.pdfUrl },
+        { label: "Source Note", value: (row) => row.sourceNote },
+        { label: "Provenance Sheet", value: provenanceSheetText }
+      ])
+    );
+  });
+
   nodes.selectionSearch.addEventListener("input", (event) => {
     state.selections.query = event.target.value;
     renderSelectionBoard();
@@ -2032,6 +3940,23 @@ function setupEvents() {
     nodes.selectionStatusFilter.value = "";
     nodes.selectionLaneFilter.value = "";
     renderSelectionBoard();
+  });
+  nodes.copySelectionDossier.addEventListener("click", async () => {
+    const label = "Copy Dossier";
+    let copied = false;
+    try {
+      copied = await writeClipboardText(selectionDossierText());
+    } catch (error) {
+      copied = false;
+    }
+    nodes.copySelectionDossier.textContent = copied ? "Copied" : "Copy failed";
+    if (copied) nodes.copySelectionDossier.dataset.copied = "true";
+    else nodes.copySelectionDossier.dataset.copyFailed = "true";
+    setTimeout(() => {
+      nodes.copySelectionDossier.textContent = label;
+      delete nodes.copySelectionDossier.dataset.copied;
+      delete nodes.copySelectionDossier.dataset.copyFailed;
+    }, 1200);
   });
   nodes.exportSelections.addEventListener("click", () => {
     downloadCsv(
@@ -2315,18 +4240,43 @@ function setupEvents() {
     state.boundary.country = event.target.value;
     renderBoundaryRecords();
   });
+  nodes.boundaryTypeFilter.addEventListener("change", (event) => {
+    state.boundary.type = event.target.value;
+    renderBoundaryRecords();
+  });
   nodes.clearBoundaryFilters.addEventListener("click", () => {
-    state.boundary = { query: "", country: "" };
+    state.boundary = { query: "", country: "", type: "" };
     nodes.boundarySearch.value = "";
     nodes.boundaryCountryFilter.value = "";
+    nodes.boundaryTypeFilter.value = "";
     renderBoundaryRecords();
+  });
+  nodes.exportBoundary.addEventListener("click", () => {
+    downloadCsv(
+      "frus-volume37-boundary-control.csv",
+      toCsv(filteredBoundaryRecords(), [
+        { label: "Boundary ID", value: (record) => record.compilerNumber },
+        { label: "Date", value: (record) => record.dateText || record.date },
+        { label: "Country", value: (record) => record.country },
+        { label: "Type", value: (record) => record.type },
+        { label: "Release", value: (record) => record.releaseStatus },
+        { label: "Title", value: (record) => record.title },
+        { label: "Participants", value: (record) => (record.participants || []).join("; ") },
+        { label: "Boundary Reason", value: (record) => record.boundaryReason },
+        { label: "Source URL", value: (record) => record.catalogUrl },
+        { label: "FRUS Source Note", value: (record) => record.frusSourceNote }
+      ])
+    );
   });
 }
 
 function init() {
   setStats();
   renderWorkbench();
+  populateFilters();
+  restoreUrlState();
   renderSelectionBoard();
+  renderPageBudget();
   renderProductionReadiness();
   renderAnnotations();
   renderChapterBriefs();
@@ -2334,15 +4284,21 @@ function init() {
   renderSourcePools();
   renderRequestPackets();
   renderSourceNoteAudit();
+  renderSourceCoverage();
+  renderSourcePrecedents();
+  renderDateControls();
   renderSourceNotePatterns();
   renderSourceCopyLedger();
+  renderProvenanceSheets();
   renderChapters();
-  populateFilters();
   renderRecords();
   renderPolicyFiles();
   renderPublicReferences();
   renderBoundaryRecords();
+  scheduleCurrentHashScroll();
   setupEvents();
+  setupViewStateEvents();
+  scheduleCurrentHashScroll();
 }
 
 init();

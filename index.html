@@ -8,7 +8,7 @@
       name="description"
       content="A compiler-facing FRUS Assist page for Foreign Relations of the United States, 1981-1988, Volume XXXVII, Trade; Monetary Policy; Industrialized Country Cooperation, 1985-1988."
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260602-trust" />
     <style id="compiler-network-style">
       .compiler-network {
         border-bottom: 1px solid rgba(31, 41, 51, 0.14);
@@ -116,6 +116,7 @@
         <a href="#records">Chronology</a>
         <a href="#workbench">Desk</a>
         <a href="#selection-board">Selection</a>
+        <a href="#page-budget">Budget</a>
         <a href="#production-readiness">Readiness</a>
         <a href="#annotation-queue">Annotations</a>
         <a href="#chapter-briefs">Briefs</a>
@@ -123,8 +124,12 @@
         <a href="#source-pools">Source Pools</a>
         <a href="#request-packets">Requests</a>
         <a href="#source-note-qa">Source QA</a>
+        <a href="#source-coverage">Coverage</a>
+        <a href="#source-precedents">Precedents</a>
+        <a href="#date-control">Date Control</a>
         <a href="#source-note-patterns">Note Lab</a>
         <a href="#source-copy-ledger">Source Ledger</a>
+        <a href="#provenance-sheets">Provenance</a>
         <a href="persons.html">Persons</a>
         <a href="#chapters">Lanes</a>
         <a href="#policy-files">Policy Files</a>
@@ -144,6 +149,11 @@
             trade frictions, exchange-rate diplomacy, G-7 summit coordination,
             strategic trade controls, and the source boundaries that keep this
             volume distinct from debt, aid, regional, and national-security files.
+          </p>
+          <p class="trust-note">
+            Source trails stay visible, exports stay plain-text, and every
+            selection remains subject to compiler judgment against the document
+            image and published FRUS precedent.
           </p>
           <div class="hero-actions" aria-label="Primary actions">
             <a class="button primary" href="#records">Open Chronology</a>
@@ -212,6 +222,7 @@
             <select id="availability-filter"></select>
           </label>
           <button id="clear-record-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="records">Copy View</button>
           <button id="export-records" type="button">CSV</button>
           <p id="records-summary" class="summary">Loading chronology...</p>
         </div>
@@ -251,6 +262,9 @@
         <div id="workbench-root" class="workbench-root" aria-live="polite">
           <p class="loading">Loading compiler desk...</p>
         </div>
+        <div class="workbench-actions">
+          <button id="copy-workbench-packet" class="copy-note" type="button">Copy Work Queue</button>
+        </div>
       </section>
 
       <section class="section selection-section" id="selection-board" aria-labelledby="selection-title">
@@ -272,11 +286,28 @@
             <select id="selection-lane-filter"></select>
           </label>
           <button id="clear-selection-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="selection-board">Copy View</button>
+          <button id="copy-selection-dossier" class="copy-note" type="button">Copy Dossier</button>
           <button id="export-selections" type="button">CSV</button>
           <p id="selection-summary" class="summary">Loading selection board...</p>
         </div>
         <div id="selection-root" class="records-root compact-records" aria-live="polite">
           <p class="loading">Loading selection board...</p>
+        </div>
+      </section>
+
+      <section class="section page-budget-section" id="page-budget" aria-labelledby="page-budget-title">
+        <div class="section-heading">
+          <p class="kicker">Page Budget</p>
+          <h2 id="page-budget-title">Keep The Volume Under 1,400 Pages</h2>
+        </div>
+        <div class="budget-actions">
+          <button id="copy-page-budget-brief" class="copy-note" type="button">Copy Budget Brief</button>
+          <button id="export-page-budget" type="button">CSV</button>
+          <p id="page-budget-summary" class="summary">Loading page budget...</p>
+        </div>
+        <div id="page-budget-root" class="budget-grid" aria-live="polite">
+          <p class="loading">Loading page budget...</p>
         </div>
       </section>
 
@@ -303,6 +334,7 @@
             <select id="production-priority-filter"></select>
           </label>
           <button id="clear-production-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="production-readiness">Copy View</button>
           <button id="export-production" type="button">CSV</button>
           <p id="production-summary" class="summary">Loading production readiness...</p>
         </div>
@@ -334,6 +366,7 @@
             <select id="annotation-type-filter"></select>
           </label>
           <button id="clear-annotation-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="annotation-queue">Copy View</button>
           <button id="export-annotations" type="button">CSV</button>
           <p id="annotation-summary" class="summary">Loading annotation queue...</p>
         </div>
@@ -361,6 +394,7 @@
             <select id="chapter-brief-urgency-filter"></select>
           </label>
           <button id="clear-chapter-brief-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="chapter-briefs">Copy View</button>
           <button id="export-chapter-briefs" type="button">CSV</button>
           <p id="chapter-brief-summary" class="summary">Loading chapter briefs...</p>
         </div>
@@ -392,6 +426,7 @@
             <select id="gap-status-filter"></select>
           </label>
           <button id="clear-gap-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="gap-tracker">Copy View</button>
           <button id="export-gaps" type="button">CSV</button>
           <p id="gap-summary" class="summary">Loading gap tracker...</p>
         </div>
@@ -419,6 +454,7 @@
             <select id="source-pool-priority-filter"></select>
           </label>
           <button id="clear-source-pool-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="source-pools">Copy View</button>
           <button id="export-source-pools" type="button">CSV</button>
           <p id="source-pool-summary" class="summary">Loading source pools...</p>
         </div>
@@ -446,6 +482,8 @@
             <select id="request-priority-filter"></select>
           </label>
           <button id="clear-request-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="request-packets">Copy View</button>
+          <button id="copy-request-bundle" class="copy-note" type="button">Copy Bundle</button>
           <button id="export-requests" type="button">CSV</button>
           <p id="request-summary" class="summary">Loading request packets...</p>
         </div>
@@ -472,12 +510,109 @@
             <span>Section</span>
             <select id="source-note-section-filter"></select>
           </label>
+          <label>
+            <span>Format</span>
+            <select id="source-note-format-filter"></select>
+          </label>
           <button id="clear-source-note-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="source-note-qa">Copy View</button>
+          <button id="copy-source-note-fixes" type="button">Fix List</button>
           <button id="export-source-notes" type="button">CSV</button>
           <p id="source-note-summary" class="summary">Loading source-note audit...</p>
         </div>
         <div id="source-note-root" class="file-grid" aria-live="polite">
           <p class="loading">Loading source-note audit...</p>
+        </div>
+      </section>
+
+      <section class="section source-coverage-section" id="source-coverage" aria-labelledby="source-coverage-title">
+        <div class="section-heading">
+          <p class="kicker">Source Coverage</p>
+          <h2 id="source-coverage-title">Lane And Citation Mix Matrix</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter source coverage">
+          <label class="search-field">
+            <span>Search coverage</span>
+            <input id="source-coverage-search" type="search" placeholder="Search lane, format, risk, next action, examples" />
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="source-coverage-status-filter"></select>
+          </label>
+          <label>
+            <span>Format</span>
+            <select id="source-coverage-format-filter"></select>
+          </label>
+          <button id="clear-source-coverage-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="source-coverage">Copy View</button>
+          <button id="copy-source-coverage-brief" class="copy-note" type="button">Copy Brief</button>
+          <button id="export-source-coverage" type="button">CSV</button>
+          <p id="source-coverage-summary" class="summary">Loading source coverage...</p>
+        </div>
+        <div id="source-coverage-root" class="file-grid" aria-live="polite">
+          <p class="loading">Loading source coverage matrix...</p>
+        </div>
+      </section>
+
+      <section class="section source-precedent-section" id="source-precedents" aria-labelledby="source-precedent-title">
+        <div class="section-heading">
+          <p class="kicker">Precedent Match</p>
+          <h2 id="source-precedent-title">History.state.gov Source-Note Models</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter source-note precedent checks">
+          <label class="search-field">
+            <span>Search precedents</span>
+            <input id="source-precedent-search" type="search" placeholder="Search model, expected shape, title, repair action" />
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="source-precedent-status-filter"></select>
+          </label>
+          <label>
+            <span>Family</span>
+            <select id="source-precedent-family-filter"></select>
+          </label>
+          <label>
+            <span>Model</span>
+            <select id="source-precedent-model-filter"></select>
+          </label>
+          <button id="clear-source-precedent-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="source-precedents">Copy View</button>
+          <button id="copy-source-precedent-checklist" class="copy-note" type="button">Copy Checklist</button>
+          <button id="export-source-precedents" type="button">CSV</button>
+          <p id="source-precedent-summary" class="summary">Loading precedent checks...</p>
+        </div>
+        <div id="source-precedent-root" class="file-grid" aria-live="polite">
+          <p class="loading">Loading source-note precedent checks...</p>
+        </div>
+      </section>
+
+      <section class="section date-control-section" id="date-control" aria-labelledby="date-control-title">
+        <div class="section-heading">
+          <p class="kicker">Daily Diary Control</p>
+          <h2 id="date-control-title">Date-Match Queue For Public And Summit Leads</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter Daily Diary date controls">
+          <label class="search-field">
+            <span>Search date controls</span>
+            <input id="date-control-search" type="search" placeholder="Search date, title, participants, risk, diary ask" />
+          </label>
+          <label>
+            <span>Lane</span>
+            <select id="date-control-lane-filter"></select>
+          </label>
+          <label>
+            <span>Priority</span>
+            <select id="date-control-priority-filter"></select>
+          </label>
+          <button id="clear-date-control-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="date-control">Copy View</button>
+          <button id="copy-date-control-brief" class="copy-note" type="button">Copy Brief</button>
+          <button id="export-date-controls" type="button">CSV</button>
+          <p id="date-control-summary" class="summary">Loading date controls...</p>
+        </div>
+        <div id="date-control-root" class="records-root compact-records" aria-live="polite">
+          <p class="loading">Loading Daily Diary date controls...</p>
         </div>
       </section>
 
@@ -504,6 +639,7 @@
             <select id="source-note-pattern-status-filter"></select>
           </label>
           <button id="clear-source-note-pattern-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="source-note-patterns">Copy View</button>
           <button id="export-source-note-patterns" type="button">CSV</button>
           <p id="source-note-pattern-summary" class="summary">Loading source-note patterns...</p>
         </div>
@@ -535,11 +671,41 @@
             <select id="ledger-priority-filter"></select>
           </label>
           <button id="clear-ledger-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="source-copy-ledger">Copy View</button>
           <button id="export-ledger" type="button">CSV</button>
           <p id="ledger-summary" class="summary ledger-summary">Loading source-copy ledger...</p>
         </div>
         <div id="ledger-root" class="records-root compact-records" aria-live="polite">
           <p class="loading">Loading source-copy ledger...</p>
+        </div>
+      </section>
+
+      <section class="section provenance-section" id="provenance-sheets" aria-labelledby="provenance-title">
+        <div class="section-heading">
+          <p class="kicker">PDF Provenance</p>
+          <h2 id="provenance-title">Append Sheets To Candidate PDFs</h2>
+        </div>
+        <div class="tools" aria-label="Search and filter provenance sheets">
+          <label class="search-field">
+            <span>Search sheets</span>
+            <input id="provenance-search" type="search" placeholder="Search title, repository, URL, source note, action" />
+          </label>
+          <label>
+            <span>Repository</span>
+            <select id="provenance-repository-filter"></select>
+          </label>
+          <label>
+            <span>Lane</span>
+            <select id="provenance-lane-filter"></select>
+          </label>
+          <button id="clear-provenance-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="provenance-sheets">Copy View</button>
+          <button id="copy-provenance-bundle" class="copy-note" type="button">Copy Sheets</button>
+          <button id="export-provenance" type="button">CSV</button>
+          <p id="provenance-summary" class="summary">Loading provenance sheet queue...</p>
+        </div>
+        <div id="provenance-root" class="file-grid" aria-live="polite">
+          <p class="loading">Loading provenance sheets...</p>
         </div>
       </section>
 
@@ -570,6 +736,7 @@
             <select id="policy-priority-filter"></select>
           </label>
           <button id="clear-policy-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="policy-files">Copy View</button>
           <button id="export-policy" type="button">CSV</button>
           <p id="policy-summary" class="summary">Loading policy file index...</p>
         </div>
@@ -593,6 +760,7 @@
             <select id="public-lane-filter"></select>
           </label>
           <button id="clear-public-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="public-references">Copy View</button>
           <button id="export-public" type="button">CSV</button>
           <p id="public-summary" class="summary">Loading public reference index...</p>
         </div>
@@ -615,7 +783,13 @@
             <span>Country</span>
             <select id="boundary-country-filter"></select>
           </label>
+          <label>
+            <span>Type</span>
+            <select id="boundary-type-filter"></select>
+          </label>
           <button id="clear-boundary-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-view="boundary">Copy View</button>
+          <button id="export-boundary" type="button">CSV</button>
           <p id="boundary-summary" class="summary">Loading boundary index...</p>
         </div>
         <div id="boundary-root" class="records-root compact-records" aria-live="polite">
@@ -667,10 +841,42 @@
             </p>
           </article>
           <article>
+            <h3>Reagan Foundations Model</h3>
+            <p>
+              <a href="https://history.state.gov/historicaldocuments/frus1981-88v01">FRUS 1981-1988, Volume I</a>
+              and its <a href="https://history.state.gov/historicaldocuments/frus1981-88v01/sources">source list</a>
+              set the Reagan-era pattern for public sources, Reagan Library staff files, WHORM, Daily Diary, Shultz papers, State lot files, and RG 56.
+            </p>
+          </article>
+          <article>
+            <h3>NARA Scout / NARA.gov</h3>
+            <p>
+              <a href="https://therealjameswilson.github.io/nara-scout/">NARA Scout</a>,
+              <a href="https://catalog.archives.gov/">NARA.gov Catalog</a>, and the
+              <a href="https://www.archives.gov/research/catalog/help/api">Catalog API notes</a>
+              are the working path for RG 56, RG 59, RG 364, and declassified hit verification.
+            </p>
+          </article>
+          <article>
             <h3>Source-Note Rule</h3>
             <p>
               Copy-ready notes use <code>Source:</code> only after repository, collection, box, folder,
               and classification are specific. Incomplete archival leads stay marked as <code>Source-note target</code>.
+            </p>
+          </article>
+          <article>
+            <h3>PDF Packet Rule</h3>
+            <p>
+              Candidate PDFs should contain only the selected document pages, any release-status marker or withdrawal sheet needed for context,
+              and an appended provenance sheet from this page.
+            </p>
+          </article>
+          <article>
+            <h3>Review Posture</h3>
+            <p>
+              Treat this as a transparent worksheet: named sources, copyable packets,
+              and CSV exports support editorial review, but final authority stays
+              with the compiler and the source image.
             </p>
           </article>
           <article>
@@ -691,12 +897,12 @@ node --check persons.js</code></pre>
     </main>
 
     <footer>
-      <p>FRUS Assist for Volume XXXVII. Data generated from public source records, official volume metadata, and first-pass compiler source lanes.</p>
+      <p>FRUS Assist for Volume XXXVII. Source-first, reviewable, and built to keep compiler judgment in charge.</p>
     </footer>
 
     <script src="data/volume-data.js"></script>
     <script src="data/persons.js"></script>
-    <script src="app.js"></script>
+    <script src="app.js?v=20260602-precedents-anchor"></script>
     <script id="compiler-network-script">
       (() => {
         const button = document.querySelector("[data-compiler-handoff]");

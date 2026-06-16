@@ -162,6 +162,17 @@ h3 {
   line-height: 1.62;
 }
 
+.trust-note {
+  max-width: 720px;
+  margin: 18px 0 0;
+  padding-left: 14px;
+  color: #46585f;
+  border-left: 3px solid rgba(47, 103, 95, 0.34);
+  font-size: 0.98rem;
+  font-weight: 760;
+  line-height: 1.58;
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
@@ -331,8 +342,15 @@ dd {
 
 .workbench-root {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
+}
+
+.workbench-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
 }
 
 .metric-card,
@@ -440,7 +458,7 @@ dd {
 
 .tools {
   display: grid;
-  grid-template-columns: minmax(250px, 2fr) repeat(4, minmax(140px, 1fr)) auto auto;
+  grid-template-columns: minmax(250px, 2fr) repeat(4, minmax(140px, 1fr)) auto auto auto;
   gap: 10px;
   align-items: end;
   margin-bottom: 20px;
@@ -453,27 +471,58 @@ dd {
 .policy-section .tools,
 .public-section .tools,
 .source-pool-section .tools {
-  grid-template-columns: minmax(250px, 2fr) minmax(160px, 1fr) minmax(140px, 1fr) auto auto;
+  grid-template-columns: minmax(250px, 2fr) minmax(160px, 1fr) minmax(140px, 1fr) auto auto auto;
 }
 
 .gap-section .tools {
-  grid-template-columns: minmax(250px, 2fr) repeat(3, minmax(140px, 1fr)) auto auto;
+  grid-template-columns: minmax(250px, 2fr) repeat(3, minmax(140px, 1fr)) auto auto auto;
+}
+
+.selection-section .tools {
+  grid-template-columns: minmax(250px, 2fr) repeat(2, minmax(150px, 1fr)) auto auto auto auto;
 }
 
 .production-section .tools,
 .annotation-section .tools,
 .ledger-section .tools,
 .source-note-pattern-section .tools {
-  grid-template-columns: minmax(250px, 2fr) repeat(3, minmax(140px, 1fr)) auto auto;
+  grid-template-columns: minmax(250px, 2fr) repeat(3, minmax(140px, 1fr)) auto auto auto;
 }
 
-.public-section .tools,
+.source-precedent-section .tools {
+  grid-template-columns: minmax(250px, 2fr) repeat(3, minmax(140px, 1fr)) auto auto auto auto;
+}
+
+.public-section .tools {
+  grid-template-columns: minmax(250px, 2fr) minmax(160px, 1fr) auto auto auto;
+}
+
 .boundary-section .tools {
-  grid-template-columns: minmax(250px, 2fr) minmax(160px, 1fr) auto auto;
+  grid-template-columns: minmax(250px, 2fr) repeat(2, minmax(160px, 1fr)) auto auto auto;
+}
+
+.source-note-section .tools {
+  grid-template-columns: minmax(250px, 2fr) repeat(3, minmax(140px, 1fr)) auto auto auto auto;
+}
+
+.source-coverage-section .tools {
+  grid-template-columns: minmax(250px, 2fr) repeat(2, minmax(150px, 1fr)) auto auto auto auto;
+}
+
+.date-control-section .tools {
+  grid-template-columns: minmax(250px, 2fr) repeat(2, minmax(150px, 1fr)) auto auto auto auto;
+}
+
+.request-section .tools {
+  grid-template-columns: minmax(250px, 2fr) repeat(2, minmax(150px, 1fr)) auto auto auto auto;
+}
+
+.provenance-section .tools {
+  grid-template-columns: minmax(250px, 2fr) repeat(2, minmax(150px, 1fr)) auto auto auto auto;
 }
 
 .persons-tools {
-  grid-template-columns: minmax(250px, 2fr) minmax(160px, 1fr) minmax(170px, 1fr) auto auto;
+  grid-template-columns: minmax(250px, 2fr) minmax(160px, 1fr) minmax(170px, 1fr) minmax(150px, 1fr) auto auto auto auto;
 }
 
 label {
@@ -662,6 +711,16 @@ button:focus-visible {
   background: var(--navy);
 }
 
+.copy-note[data-copied="true"] {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.copy-note[data-copy-failed="true"] {
+  background: var(--rust);
+  border-color: var(--rust);
+}
+
 .record-actions a:hover,
 .record-actions a:focus-visible,
 .file-actions a:hover,
@@ -839,6 +898,60 @@ summary {
   margin-top: auto;
 }
 
+.budget-actions {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.budget-actions .summary {
+  grid-column: auto;
+  margin: 0;
+}
+
+.budget-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.budget-card {
+  border-top-color: var(--green);
+}
+
+.budget-card.over-budget {
+  border-top-color: var(--rust);
+}
+
+.rules-card {
+  border-top-color: var(--navy);
+}
+
+.budget-bar {
+  height: 12px;
+  overflow: hidden;
+  background: #e5ece8;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.budget-bar span {
+  display: block;
+  height: 100%;
+  max-width: 100%;
+  background: linear-gradient(90deg, var(--green), var(--blue));
+}
+
+.provenance-card {
+  border-top-color: var(--gold);
+}
+
 .compact-records .record-card {
   border-top: 4px solid var(--plum);
 }
@@ -923,6 +1036,64 @@ summary {
   border-top: 4px solid var(--gold);
 }
 
+.date-control-card.priority-critical {
+  border-top: 4px solid var(--rust);
+}
+
+.date-control-card.priority-high {
+  border-top: 4px solid var(--gold);
+}
+
+.date-control-card.priority-medium {
+  border-top: 4px solid var(--blue);
+}
+
+.source-precedent-card.status-needs-repair {
+  border-top: 4px solid var(--rust);
+}
+
+.source-precedent-card.status-target-only {
+  border-top: 4px solid var(--gold);
+}
+
+.source-precedent-card.status-matches-precedent {
+  border-top: 4px solid var(--green);
+}
+
+.source-precedent-card.status-reference-control {
+  border-top: 4px solid var(--blue);
+}
+
+.coverage-counts {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.coverage-counts div {
+  display: block;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 9px;
+  background: rgba(244, 247, 249, 0.82);
+}
+
+.coverage-counts dt {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.coverage-counts dd {
+  margin: 2px 0 0;
+  color: var(--navy);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
 .persons-root {
   display: grid;
   gap: 24px;
@@ -953,6 +1124,14 @@ summary {
 
 .persons-list li::marker {
   color: var(--muted);
+}
+
+.persons-list li {
+  padding-left: 8px;
+}
+
+.persons-list li.person-review-needed {
+  border-left: 4px solid var(--gold);
 }
 
 .person-entry {
@@ -1021,6 +1200,7 @@ footer {
   .workbench-root,
   .chapter-grid,
   .gap-grid,
+  .budget-grid,
   .source-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1033,9 +1213,16 @@ footer {
   .tools,
   .policy-section .tools,
   .gap-section .tools,
+  .selection-section .tools,
   .production-section .tools,
   .annotation-section .tools,
   .ledger-section .tools,
+  .request-section .tools,
+  .provenance-section .tools,
+  .source-note-section .tools,
+  .source-coverage-section .tools,
+  .source-precedent-section .tools,
+  .date-control-section .tools,
   .source-note-pattern-section .tools,
   .source-pool-section .tools,
   .persons-tools,
@@ -1081,20 +1268,36 @@ footer {
   .workbench-root,
   .chapter-grid,
   .gap-grid,
+  .budget-grid,
   .file-grid,
   .source-grid,
   .tools,
   .policy-section .tools,
   .gap-section .tools,
+  .selection-section .tools,
   .production-section .tools,
   .annotation-section .tools,
   .ledger-section .tools,
+  .request-section .tools,
+  .provenance-section .tools,
+  .source-note-section .tools,
+  .source-coverage-section .tools,
+  .source-precedent-section .tools,
+  .date-control-section .tools,
   .source-note-pattern-section .tools,
   .source-pool-section .tools,
   .persons-tools,
   .public-section .tools,
   .boundary-section .tools {
     grid-template-columns: 1fr;
+  }
+
+  .budget-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .budget-actions .summary {
+    grid-column: 1;
   }
 
   .hero {
@@ -1137,5 +1340,9 @@ footer {
   .chapter-title-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .coverage-counts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

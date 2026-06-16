@@ -8,7 +8,7 @@
       name="description"
       content="Compiler persons list for Foreign Relations of the United States, 1981-1988, Volume XXXVII, Trade; Monetary Policy; Industrialized Country Cooperation, 1985-1988."
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260602-trust" />
   </head>
   <body>
     <header class="site-header">
@@ -36,6 +36,10 @@
           seeded from Reagan administration source text, Public Papers, NSDD
           leads, G-7 counterparts, and the current Volume XXXVII gap tracker.
         </p>
+        <p class="trust-note">
+          Entries keep their source labels and review status visible so final
+          names, offices, and dates can be checked against selected documents.
+        </p>
       </section>
 
       <section class="section persons-section" aria-labelledby="persons-list-title">
@@ -58,7 +62,13 @@
             <span>Source</span>
             <select id="person-source-filter"></select>
           </label>
+          <label>
+            <span>Review</span>
+            <select id="person-review-filter"></select>
+          </label>
           <button id="clear-person-filters" type="button">Reset</button>
+          <button class="copy-note" type="button" data-copy-person-view>Copy View</button>
+          <button id="copy-person-review" class="copy-note" type="button">Copy Review Queue</button>
           <button id="export-persons" type="button">CSV</button>
           <p id="person-summary" class="summary">Loading persons...</p>
         </div>
@@ -69,10 +79,10 @@
     </main>
 
     <footer>
-      <p>Persons list for Volume XXXVII. Entries are compiler-facing leads and should be normalized against final source selection.</p>
+      <p>Persons list for Volume XXXVII. A source-labeled authority worksheet for human editorial review.</p>
     </footer>
 
     <script src="data/persons.js"></script>
-    <script src="persons.js"></script>
+    <script src="persons.js?v=20260602-precedents-anchor"></script>
   </body>
 </html>

@@ -2,6 +2,8 @@ const OFFICIAL_VOLUME_URL = "https://history.state.gov/historicaldocuments/frus1
 const REAGAN_VOLUME_LIST_URL = "https://history.state.gov/historicaldocuments/reagan";
 const NSDD_INDEX_URL = "https://www.reaganlibrary.gov/reagans/reagan-administration/nsdd-digitized-reference-copies";
 const PUBLIC_PAPERS_URL = "https://www.reaganlibrary.gov/archives/public-papers-president-ronald-reagan";
+const FRUS_1981_88_V01_URL = "https://history.state.gov/historicaldocuments/frus1981-88v01";
+const FRUS_1981_88_V01_SOURCES_URL = "https://history.state.gov/historicaldocuments/frus1981-88v01/sources";
 const FRUS_1977_80_V03_SOURCES_URL = "https://history.state.gov/historicaldocuments/frus1977-80v03/sources";
 const FRUS_1981_88_V38_SOURCES_URL = "https://history.state.gov/historicaldocuments/frus1981-88v38/sources";
 const FRUS_1977_80_V03_D258_URL = "https://history.state.gov/historicaldocuments/frus1977-80v03/d258fn1";
@@ -14,6 +16,18 @@ const DANZANSKY_TRADE_FOIA_URL = "https://www.reaganlibrary.gov/public/foia/f06-
 const DANZANSKY_GRAIN_LTA_URL = "https://www.reaganlibrary.gov/public/digitallibrary/smof/nsc-internationaleconomicaffairs/danzansky/r12/40-733-R12-038-2019.pdf";
 const BAKER_TORONTO_SUMMIT_URL = "https://www.reaganlibrary.gov/public/digitallibrary/smof/cos/bakerhoward/box-005/40-27-6912132-005-003-2017.pdf";
 const SPRINKEL_TORONTO_SUMMIT_URL = "https://www.reaganlibrary.gov/public/2022-03/40-537-12013953-OA17743-012-2021.pdf";
+const NARA_SCOUT_URL = "https://therealjameswilson.github.io/nara-scout/";
+const NARA_CATALOG_URL = "https://catalog.archives.gov/";
+const NARA_API_DOCS_URL = "https://www.archives.gov/research/catalog/help/api";
+
+function naraCatalogSearchUrl(query) {
+  return `${NARA_CATALOG_URL}search?q=${encodeURIComponent(query)}`;
+}
+
+const NARA_RG56_SEARCH_URL = naraCatalogSearchUrl('"RG 56" "International Affairs" Plaza Louvre "1985" "1988"');
+const NARA_RG59_SEARCH_URL = naraCatalogSearchUrl('"RG 59" "economic" "G-7" "1985" "1988"');
+const NARA_RG364_SEARCH_URL = naraCatalogSearchUrl('"RG 364" "United States Trade Representative" GATT Canada Japan "1985" "1988"');
+const NARA_NSDD_SEARCH_URL = naraCatalogSearchUrl('"NSDD" "Reagan Library" "trade" "summit"');
 
 const lanes = {
   trade: { number: 1, name: "Trade Policy and Market Access" },
@@ -60,6 +74,52 @@ window.VOLUME_META = {
     }
   ],
   generatedAt: "2026-05-27T00:00:00-04:00"
+};
+
+window.PAGE_BUDGET = {
+  totalPages: 1400,
+  documentTargetPages: 1120,
+  apparatusReservePages: 280,
+  reserveRule: "Hold roughly 20 percent for front matter, sources, annotation density, persons, abbreviations, index, and late declassification substitutions.",
+  laneTargets: [
+    {
+      lane: lanes.trade.name,
+      targetPages: 360,
+      currentAllowance: 310,
+      rule: "Print negotiation and decision records over public speeches; use Public Papers as endpoints or annotations unless no private record survives."
+    },
+    {
+      lane: lanes.monetary.name,
+      targetPages: 260,
+      currentAllowance: 220,
+      rule: "Do not fill the chapter with summit declarations; reserve space for Treasury/Fed and G-5/G-7 finance-minister evidence found through NARA."
+    },
+    {
+      lane: lanes.summits.name,
+      targetPages: 320,
+      currentAllowance: 285,
+      rule: "Use each summit as a compact package: one preparation directive, one internal decision or talking-points record, one public endpoint where needed."
+    },
+    {
+      lane: lanes.controls.name,
+      targetPages: 150,
+      currentAllowance: 120,
+      rule: "Keep strategic trade controls only where they show foreign economic policy, allied coordination, COCOM, or technology-transfer decisions."
+    },
+    {
+      lane: lanes.boundary.name,
+      targetPages: 30,
+      currentAllowance: 0,
+      rule: "Boundary records should usually appear as notes or handoffs, not printed documents."
+    }
+  ],
+  selectionRules: [
+    "Every selected PDF candidate gets a provenance sheet appended after the selected document pages.",
+    "No folder PDF is promoted whole; extract the policy-bearing document pages, then append the provenance sheet.",
+    "Debt, aid, and development documents count against Volume XXXVIII unless they directly control trade, monetary, summit, or strategic trade-control decisions.",
+    "NARA Scout/NARA.gov hits stay as source-note targets until repository, record group, series or accession, box, folder, release status, and page span are verified.",
+    "Prefer a smaller sequence of high-level decision records to a long run of public-line or duplicate background material."
+  ]
 };
 
 window.VOLUME_RECORDS = [
@@ -1137,12 +1197,28 @@ window.GAP_TRACKER = [
 
 window.SOURCE_POOLS = [
   {
+    title: "NARA Scout and NARA.gov Catalog search pass",
+    lane: lanes.boundary.name,
+    priority: "Active",
+    url: NARA_SCOUT_URL,
+    coverage: "Catalog-facing search lane for RG 56 Treasury, RG 59 State economic files, RG 364 USTR files, and Reagan Library/NARA descriptions that are not yet document-level rows.",
+    nextUse: "Run exact searches in NARA Scout and NARA.gov, then preserve NAID or Catalog URL, record group, series/accession, box, folder, release status, PDF URL, and provenance-sheet action for every promoted hit."
+  },
+  {
     title: "Reagan Library NSDD digitized reference copies",
     lane: lanes.controls.name,
     priority: "Active",
     url: NSDD_INDEX_URL,
     coverage: "Signed National Security Decision Directives, including economic summit preparations, Japan/Soviet trade, machine tools, and strategic trade controls.",
     nextUse: "Verify each cited NSDD PDF, then check NSDD records for attachments, background papers, and withdrawals."
+  },
+  {
+    title: "FRUS 1981-1988 Volume I Foundations source model",
+    lane: lanes.boundary.name,
+    priority: "Active",
+    url: FRUS_1981_88_V01_SOURCES_URL,
+    coverage: "Published Reagan-era source model for public sources, Reagan Library staff/office files, WHORM, Presidential Daily Diary, George Shultz Papers, State lot files, and RG 56 Treasury records.",
+    nextUse: "Use alongside the same-compiler Carter Volume III precedent to keep Reagan Library, State, Treasury, and public-source lanes distinct before final source-note drafting."
   },
   {
     title: "Stephen I. Danzansky Files",
@@ -1188,15 +1264,15 @@ window.SOURCE_POOLS = [
     title: "NARA RG 56 Treasury International Affairs",
     lane: lanes.monetary.name,
     priority: "Missing",
-    url: FRUS_1977_80_V03_SOURCES_URL,
+    url: NARA_RG56_SEARCH_URL,
     coverage: "Treasury International Affairs source target for exchange-rate diplomacy, G-5/G-7 finance-minister meetings, and Plaza/Louvre follow-through.",
-    nextUse: "Harvest exact series, box, and folder information; keep all notes as source-note targets until NARA pull data is precise."
+    nextUse: "Harvest exact series, box, and folder information through NARA Scout/NARA.gov; keep all notes as source-note targets until NARA pull data is precise."
   },
   {
     title: "NARA RG 59 State economic files",
     lane: lanes.monetary.name,
     priority: "Missing",
-    url: FRUS_1977_80_V03_SOURCES_URL,
+    url: NARA_RG59_SEARCH_URL,
     coverage: "Central Foreign Policy File and lot-file source targets for State economic cables, summit reporting, and Under Secretary for Economic Affairs records.",
     nextUse: "Separate Central Foreign Policy File document-number citations from Secretariat Staff lot-file box/folder citations."
   },
@@ -1204,7 +1280,7 @@ window.SOURCE_POOLS = [
     title: "NARA RG 364 USTR trade files",
     lane: lanes.trade.name,
     priority: "Missing",
-    url: FRUS_1977_80_V03_SOURCES_URL,
+    url: NARA_RG364_SEARCH_URL,
     coverage: "USTR source target for GATT/Uruguay Round, Canada FTA, Japan market access, agriculture, and trade-legislation records.",
     nextUse: "Confirm accession or series information before converting any RG 364 row from target language into a FRUS source note."
   },
@@ -1349,8 +1425,8 @@ window.REQUEST_PACKETS = [
     title: "RG 56 Treasury International Affairs Plaza/Louvre Channel",
     sourceWindow: "1985-1988",
     requestType: "NARA pull plan",
-    catalogLabel: "Volume III source precedent",
-    catalogUrl: FRUS_1977_80_V03_SOURCES_URL,
+    catalogLabel: "NARA.gov search",
+    catalogUrl: NARA_RG56_SEARCH_URL,
     purpose: "Build the missing monetary-policy spine from Treasury International Affairs, finance-minister, and G-5/G-7 records.",
     exactAsk: "Identify RG 56 series, boxes, and folders for Plaza Accord implementation, Louvre Accord, dollar/exchange-rate coordination, G-5/G-7 finance ministers, Baker, Mulford, Brady, Volcker, and Greenspan.",
     requestText: "Please identify and pull NARA RG 56 Treasury International Affairs records for 1985-1988 on Plaza Accord implementation, Louvre Accord, dollar/exchange-rate coordination, G-5/G-7 finance ministers, Baker, Mulford, Brady, Volcker, and Greenspan. The source-note target must not be finalized until exact series, box, and folder data are confirmed.",
@@ -1365,8 +1441,8 @@ window.REQUEST_PACKETS = [
     title: "RG 59 State Economic Cables and Lot Files",
     sourceWindow: "1985-1988",
     requestType: "NARA pull plan",
-    catalogLabel: "Volume III source precedent",
-    catalogUrl: FRUS_1977_80_V03_SOURCES_URL,
+    catalogLabel: "NARA.gov search",
+    catalogUrl: NARA_RG59_SEARCH_URL,
     purpose: "Recover State Department economic reporting, summit prep, and Under Secretary for Economic Affairs files that White House collections will not fully capture.",
     exactAsk: "Search RG 59 Central Foreign Policy File and economic lot files for Tokyo, Venice, Toronto, G-5/G-7, exchange rates, Canada FTA, GATT/Uruguay Round, Japan trade, and strategic trade controls.",
     requestText: "Please search NARA RG 59 Central Foreign Policy File and State economic lot files for 1985-1988 records on Tokyo, Venice, Toronto, G-5/G-7, exchange rates, Canada FTA, GATT/Uruguay Round, Japan trade, and strategic trade controls. Keep Central Foreign Policy File document-number citations separate from Secretariat Staff lot-file box/folder citations.",
@@ -1381,8 +1457,8 @@ window.REQUEST_PACKETS = [
     title: "RG 364 USTR Trade Files",
     sourceWindow: "1985-1988",
     requestType: "NARA pull plan",
-    catalogLabel: "Volume III source precedent",
-    catalogUrl: FRUS_1977_80_V03_SOURCES_URL,
+    catalogLabel: "NARA.gov search",
+    catalogUrl: NARA_RG364_SEARCH_URL,
     purpose: "Fill the multilateral and bilateral trade record with USTR files rather than relying on speeches and White House summaries.",
     exactAsk: "Identify RG 364 accession or series data for USTR files on GATT/Uruguay Round, Canada FTA, Japan market access, agriculture, semiconductors, Super 301, and Omnibus Trade Act.",
     requestText: "Please identify NARA RG 364 USTR accession or series data and pull 1985-1988 files on GATT/Uruguay Round, Canada FTA, Japan market access, agriculture, semiconductors, Super 301, and Omnibus Trade Act. The goal is to establish the trade negotiation spine behind public Reagan administration statements.",
