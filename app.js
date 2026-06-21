@@ -17,6 +17,7 @@ const persons = window.PERSONS || [];
 const chapters = meta.chapters || [];
 const pageBudget = window.PAGE_BUDGET || {};
 const sourceNoteAudit = buildSourceNoteAudit();
+const reaganLibrarySourceNotes = buildReaganLibrarySourceNotes();
 const sourceCoverageRows = buildSourceCoverageRows();
 const sourcePrecedentRows = buildSourcePrecedentRows();
 const dateControlRows = buildDateControlRows();
@@ -228,6 +229,10 @@ const nodes = {
   clearSourceNoteFilters: document.querySelector("#clear-source-note-filters"),
   copySourceNoteFixes: document.querySelector("#copy-source-note-fixes"),
   exportSourceNotes: document.querySelector("#export-source-notes"),
+  reaganSourceNoteRoot: document.querySelector("#reagan-source-note-root"),
+  reaganSourceNoteSummary: document.querySelector("#reagan-source-note-summary"),
+  copyReaganSourceNotes: document.querySelector("#copy-reagan-source-notes"),
+  exportReaganSourceNotes: document.querySelector("#export-reagan-source-notes"),
   sourceCoverageRoot: document.querySelector("#source-coverage-root"),
   sourceCoverageSummary: document.querySelector("#source-coverage-summary"),
   sourceCoverageSearch: document.querySelector("#source-coverage-search"),
@@ -1445,6 +1450,98 @@ function sourceNoteFixListText() {
   }
 
   return output.join("\n").trimEnd();
+}
+
+function buildReaganLibrarySourceNotes() {
+  const containers = [
+    ...records.map((item) => ({ ...item, section: "Chronology" })),
+    ...productionReadiness.map((item) => ({ ...item, section: "Production Readiness" })),
+    ...sourceCopyLedger.map((item) => ({ ...item, section: "Source-Copy Ledger" })),
+    ...policyFiles.map((item) => ({ ...item, section: "Policy Files" }))
+  ];
+  const seen = new Set();
+  const rows = [];
+
+  for (const item of containers) {
+    const note = item.frusSourceNote || item.sourceNote || "";
+    if (!/^Source: Reagan Library,/.test(note)) continue;
+    if (/\[[^\]]+\]/.test(note)) continue;
+    if (seen.has(note)) continue;
+    seen.add(note);
+    rows.push({
+      noteId: `RL-${String(rows.length + 1).padStart(3, "0")}`,
+      title: item.title || item.sourceTitle || item.recordId || item.identifier || "Reagan Library source note",
+      dateText: item.dateText || item.date || "",
+      sortDate: item.sortDate || item.date || item.dateText || "",
+      lane: item.lane || item.chapter?.name || "Source-note model",
+      section: item.section || "Source data",
+      priority: item.priority || item.releaseStatus || "Copy-ready",
+      identifier: item.identifier || item.recordId || "",
+      sourceNote: note,
+      catalogUrl: item.catalogUrl || "",
+      pdfUrl: item.pdfUrl || ""
+    });
+  }
+
+  return rows.sort((a, b) => (a.sortDate || "").localeCompare(b.sortDate || "") || a.title.localeCompare(b.title));
+}
+
+function renderReaganLibrarySourceNotes() {
+  const count = reaganLibrarySourceNotes.length;
+  nodes.reaganSourceNoteSummary.textContent = `${plural(count, "exact Reagan Library source note")} ready for copy into source-note review.`;
+  if (!count) {
+    nodes.reaganSourceNoteRoot.innerHTML = '<p class="empty">No exact Reagan Library source notes are currently available.</p>';
+    return;
+  }
+  nodes.reaganSourceNoteRoot.replaceChildren(...reaganLibrarySourceNotes.map(reaganLibrarySourceNoteCard));
+}
+
+function reaganLibrarySourceNoteCard(row) {
+  const card = document.createElement("article");
+  card.className = "file-card source-note-card status-ready";
+
+  const header = document.createElement("header");
+  const titleBlock = document.createElement("div");
+  const meta = document.createElement("div");
+  meta.className = "file-meta";
+  meta.append(textSpan(row.noteId), textSpan(row.section), textSpan(row.dateText));
+  const title = document.createElement("h3");
+  title.textContent = row.title;
+  titleBlock.append(meta, title);
+  header.append(titleBlock);
+
+  const chips = document.createElement("div");
+  chips.className = "chips";
+  chips.append(chip("Exact Source note", "good"), chip(row.lane));
+  if (row.identifier) chips.append(chip(row.identifier, "boundary"));
+
+  const note = document.createElement("p");
+  note.className = "source-note";
+  note.textContent = row.sourceNote;
+
+  const actions = document.createElement("div");
+  actions.className = "file-actions";
+  if (row.catalogUrl) actions.append(linkButton("Source", row.catalogUrl));
+  if (row.pdfUrl) actions.append(linkButton("PDF", row.pdfUrl));
+  actions.append(copyButton(row.sourceNote, "Copy note"));
+
+  card.append(header, chips, note, actions);
+  return card;
+}
+
+function reaganLibrarySourceNotesText() {
+  if (!reaganLibrarySourceNotes.length) return "No exact Reagan Library source notes are currently available.";
+  return [
+    "FRUS Volume XXXVII Reagan Library source notes",
+    `Copied: ${new Date().toISOString().slice(0, 10)}`,
+    `Exact notes: ${reaganLibrarySourceNotes.length}`,
+    "",
+    ...reaganLibrarySourceNotes.flatMap((row) => [
+      `${row.noteId} | ${row.dateText || "Undated"} | ${row.title}`,
+      row.sourceNote,
+      ""
+    ])
+  ].join("\n").trimEnd();
 }
 
 function sourcePrecedentProfile(row) {
@@ -3597,6 +3694,39 @@ function setupEvents() {
       ])
     );
   });
+  nodes.copyReaganSourceNotes.addEventListener("click", async () => {
+    const label = "Copy All Notes";
+    let copied = false;
+    try {
+      copied = await writeClipboardText(reaganLibrarySourceNotesText());
+    } catch (error) {
+      copied = false;
+    }
+    nodes.copyReaganSourceNotes.textContent = copied ? "Copied" : "Copy failed";
+    if (copied) nodes.copyReaganSourceNotes.dataset.copied = "true";
+    else nodes.copyReaganSourceNotes.dataset.copyFailed = "true";
+    setTimeout(() => {
+      nodes.copyReaganSourceNotes.textContent = label;
+      delete nodes.copyReaganSourceNotes.dataset.copied;
+      delete nodes.copyReaganSourceNotes.dataset.copyFailed;
+    }, 1200);
+  });
+  nodes.exportReaganSourceNotes.addEventListener("click", () => {
+    downloadCsv(
+      "frus-volume37-reagan-library-source-notes.csv",
+      toCsv(reaganLibrarySourceNotes, [
+        { label: "Note ID", value: (row) => row.noteId },
+        { label: "Date", value: (row) => row.dateText },
+        { label: "Section", value: (row) => row.section },
+        { label: "Lane", value: (row) => row.lane },
+        { label: "Title", value: (row) => row.title },
+        { label: "Identifier", value: (row) => row.identifier },
+        { label: "FRUS Source Note", value: (row) => row.sourceNote },
+        { label: "Source URL", value: (row) => row.catalogUrl },
+        { label: "PDF URL", value: (row) => row.pdfUrl }
+      ])
+    );
+  });
 
   nodes.sourceCoverageSearch.addEventListener("input", (event) => {
     state.sourceCoverage.query = event.target.value;
@@ -4284,6 +4414,7 @@ function init() {
   renderSourcePools();
   renderRequestPackets();
   renderSourceNoteAudit();
+  renderReaganLibrarySourceNotes();
   renderSourceCoverage();
   renderSourcePrecedents();
   renderDateControls();

@@ -19,6 +19,7 @@ The page is deliberately source-first: every cue is meant to remain reviewable, 
 - searchable/exportable source pools
 - searchable/exportable request packets with copyable Reagan Library and NARA request bundles
 - source-note QA audit with FRUS-format filters and copyable fix list for ready notes, target notes, references, and rows needing review
+- separate Reagan Library source-note section listing exact `Source: Reagan Library, ...` citations with bracketed templates excluded
 - source coverage matrix with lane/format readiness counts, copyable brief, and CSV export
 - source-note precedent-match queue keyed to official Volume III, Volume XXXVIII, Public Papers, Daily Diary, and adjacent-volume models
 - Daily Diary date-control queue for public endpoints, summit anchors, calls, and meeting-context checks

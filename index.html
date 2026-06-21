@@ -124,6 +124,7 @@
         <a href="#source-pools">Source Pools</a>
         <a href="#request-packets">Requests</a>
         <a href="#source-note-qa">Source QA</a>
+        <a href="#reagan-library-source-notes">Reagan Notes</a>
         <a href="#source-coverage">Coverage</a>
         <a href="#source-precedents">Precedents</a>
         <a href="#date-control">Date Control</a>
@@ -525,6 +526,27 @@
         </div>
       </section>
 
+      <section class="section source-note-section" id="reagan-library-source-notes" aria-labelledby="reagan-library-source-note-title">
+        <div class="section-heading">
+          <p class="kicker">Reagan Library Citations</p>
+          <h2 id="reagan-library-source-note-title">Exact FRUS Source Notes</h2>
+        </div>
+        <p class="section-note">
+          This list contains only copy-ready citation strings that begin
+          <code>Source: Reagan Library,</code> and have no bracket placeholders.
+          Source-note targets and templates stay in the QA and pattern sections until
+          the exact collection, box/folder, item, and markings are verified.
+        </p>
+        <div class="tools" aria-label="Copy and export Reagan Library source notes">
+          <button id="copy-reagan-source-notes" class="copy-note" type="button">Copy All Notes</button>
+          <button id="export-reagan-source-notes" type="button">CSV</button>
+          <p id="reagan-source-note-summary" class="summary">Loading Reagan Library source notes...</p>
+        </div>
+        <div id="reagan-source-note-root" class="file-grid" aria-live="polite">
+          <p class="loading">Loading Reagan Library source notes...</p>
+        </div>
+      </section>
+
       <section class="section source-coverage-section" id="source-coverage" aria-labelledby="source-coverage-title">
         <div class="section-heading">
           <p class="kicker">Source Coverage</p>
@@ -902,7 +924,7 @@ node --check persons.js</code></pre>
 
     <script src="data/volume-data.js"></script>
     <script src="data/persons.js"></script>
-    <script src="app.js?v=20260602-precedents-anchor"></script>
+    <script src="app.js?v=20260619-reagan-source-notes"></script>
     <script id="compiler-network-script">
       (() => {
         const button = document.querySelector("[data-compiler-handoff]");
