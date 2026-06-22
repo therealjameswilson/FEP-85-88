@@ -4,10 +4,7 @@ const NSDD_INDEX_URL = "https://www.reaganlibrary.gov/reagans/reagan-administrat
 const PUBLIC_PAPERS_URL = "https://www.reaganlibrary.gov/archives/public-papers-president-ronald-reagan";
 const FRUS_1981_88_V01_URL = "https://history.state.gov/historicaldocuments/frus1981-88v01";
 const FRUS_1981_88_V01_SOURCES_URL = "https://history.state.gov/historicaldocuments/frus1981-88v01/sources";
-const FRUS_1977_80_V03_SOURCES_URL = "https://history.state.gov/historicaldocuments/frus1977-80v03/sources";
 const FRUS_1981_88_V38_SOURCES_URL = "https://history.state.gov/historicaldocuments/frus1981-88v38/sources";
-const FRUS_1977_80_V03_D258_URL = "https://history.state.gov/historicaldocuments/frus1977-80v03/d258fn1";
-const FRUS_1977_80_V03_D192_URL = "https://history.state.gov/historicaldocuments/frus1977-80v03/d192fn3";
 const FRUS_1981_88_V38_D169_URL = "https://history.state.gov/historicaldocuments/frus1981-88v38/d169";
 const FRUS_1981_88_V38_D355_URL = "https://history.state.gov/historicaldocuments/frus1981-88v38/d355";
 const FRUS_1981_88_V38_D221_URL = "https://history.state.gov/historicaldocuments/frus1981-88v38/d221fn3";
@@ -771,11 +768,11 @@ window.POLICY_FILES = [
     priority: "Missing",
     title: "National Archives RG 56 Treasury International Affairs Records",
     identifier: "NARA RG 56",
-    catalogLabel: "Volume III source precedent",
-    catalogUrl: FRUS_1977_80_V03_SOURCES_URL,
+    catalogLabel: "Volume XXXVIII source precedent",
+    catalogUrl: FRUS_1981_88_V38_SOURCES_URL,
     itemExtent: "archival source target",
     accessRestriction: "NARA College Park request needed",
-    reason: "The same-compiler Carter foreign economic policy volume used Treasury International Affairs records for international monetary and trade policy; Volume XXXVII needs the Reagan-period successor channel for Plaza/Louvre and G-5/G-7 finance-minister files.",
+    reason: "The published Reagan Volume XXXVIII source list identifies Treasury RG 56 channels for international economic policy; Volume XXXVII needs the Reagan-period monetary-policy channel for Plaza/Louvre and G-5/G-7 finance-minister files.",
     frusSourceNote: "Source-note target: National Archives, RG 56, Records of the Department of the Treasury, Office of the Assistant Secretary for International Affairs, [series], [box], [folder].",
     sourceNote: "Do not convert to a final FRUS source note until exact series, box, and folder are verified."
   },
@@ -786,13 +783,13 @@ window.POLICY_FILES = [
     priority: "Missing",
     title: "National Archives RG 59 State Economic and Central Foreign Policy Files",
     identifier: "NARA RG 59",
-    catalogLabel: "Volume III source precedent",
-    catalogUrl: FRUS_1977_80_V03_SOURCES_URL,
+    catalogLabel: "Volume XXXVIII source precedent",
+    catalogUrl: FRUS_1981_88_V38_SOURCES_URL,
     itemExtent: "archival source target",
     accessRestriction: "NARA College Park request needed",
-    reason: "Volume III source notes show the exact distinction needed here: Central Foreign Policy File citations for cables, and Secretariat Staff/lot-file citations for office records.",
-    frusSourceNote: "Source-note target: National Archives, RG 59, Central Foreign Policy File, [document number].",
-    sourceNote: "For lot files, normalize separately as: Source-note target: National Archives, RG 59, Office of the Secretariat Staff, [office records], [lot], [box], [folder]."
+    reason: "The published Reagan Volume XXXVIII source list preserves the distinction needed here: Central Foreign Policy File citations for cables and State lot-file citations for office records.",
+    frusSourceNote: "Source-note target: Department of State, Central Foreign Policy File, [Electronic Telegrams/D Reels/N Reels/P Reels], [telegram or document identifier].",
+    sourceNote: "For lot files, normalize separately as: Source-note target: Department of State, [office or Executive Secretariat], [records series], Lot [number], [collection title], [folder title]."
   },
   {
     sortDate: "1985-01-01",
@@ -801,11 +798,11 @@ window.POLICY_FILES = [
     priority: "Missing",
     title: "National Archives RG 364 USTR Trade Records",
     identifier: "NARA RG 364",
-    catalogLabel: "Volume III source precedent",
-    catalogUrl: FRUS_1977_80_V03_SOURCES_URL,
+    catalogLabel: "Reagan-style source target",
+    catalogUrl: FRUS_1981_88_V38_SOURCES_URL,
     itemExtent: "archival source target",
     accessRestriction: "NARA College Park request needed",
-    reason: "The Carter foreign economic policy source base used RG 364 for Special Trade Representative subject files; Volume XXXVII should test Reagan-period USTR files for GATT, Canada FTA, Japan, agriculture, and Omnibus Trade Act records.",
+    reason: "Volume XXXVIII supplies the Reagan subseries repository-first source-note order; Volume XXXVII should test Reagan-period USTR RG 364 files for GATT, Canada FTA, Japan, agriculture, and Omnibus Trade Act records without treating the target as copy-ready.",
     frusSourceNote: "Source-note target: National Archives, RG 364, Records of the Office of the United States Trade Representative, [accession/series], [box], [folder].",
     sourceNote: "Keep as a target until accession, box, and folder data are harvested."
   },
@@ -1058,7 +1055,7 @@ window.GAP_TRACKER = [
     problem: "Without finance-minister and exchange-rate records, the monetary-policy chapter will over-rely on public summit statements.",
     needed: "Treasury, Federal Reserve, State E, NSC Danzansky, Baker/Regan/Brady, and G-5/G-7 finance-minister records for 1985-1988.",
     nextActions: [
-      "Use the same-compiler Volume III source precedents to identify Treasury, State, and USTR record-group formats.",
+      "Use the published Reagan Volume XXXVIII source-note model to keep Treasury, State, Reagan Library, and public-source formats in repository-first order.",
       "Date-match Plaza and Louvre follow-through against Reagan Daily Diary and summit preparation files.",
       "Build a sub-ledger for Baker, Regan, Brady, Volcker, and Greenspan contacts."
     ],
@@ -1218,7 +1215,7 @@ window.SOURCE_POOLS = [
     priority: "Active",
     url: FRUS_1981_88_V01_SOURCES_URL,
     coverage: "Published Reagan-era source model for public sources, Reagan Library staff/office files, WHORM, Presidential Daily Diary, George Shultz Papers, State lot files, and RG 56 Treasury records.",
-    nextUse: "Use alongside the same-compiler Carter Volume III precedent to keep Reagan Library, State, Treasury, and public-source lanes distinct before final source-note drafting."
+    nextUse: "Use alongside Volume XXXVIII to keep Reagan Library, State, Treasury, and public-source lanes distinct before final source-note drafting."
   },
   {
     title: "Stephen I. Danzansky Files",
@@ -1256,9 +1253,9 @@ window.SOURCE_POOLS = [
     title: "Treasury/Federal Reserve monetary-policy channels",
     lane: lanes.monetary.name,
     priority: "Missing",
-    url: FRUS_1977_80_V03_SOURCES_URL,
+    url: FRUS_1981_88_V38_SOURCES_URL,
     coverage: "External archival route for Plaza/Louvre, exchange-rate, G-5/G-7 finance-minister, and macroeconomic coordination records.",
-    nextUse: "Use the same-compiler Volume III source precedents for Treasury, State, and trade record-group formatting before drafting final source notes."
+    nextUse: "Use the published Reagan Volume XXXVIII source-note model for Treasury and State formatting; keep USTR rows target-only until RG 364 accession data is precise."
   },
   {
     title: "NARA RG 56 Treasury International Affairs",
@@ -1615,10 +1612,10 @@ window.SELECTION_BOARD = [
     selectionRationale: "The monetary chapter cannot be selected responsibly without Treasury/Fed finance-minister records.",
     boundaryRisk: "White House summit files are insufficient and may overstate public declaration material.",
     nextAction: "Execute RG 56 request packet and create document-level rows after exact series/box/folder data are known.",
-    annotationLead: "Use FRUS 1977-1980 Volume III source-note formatting as model once exact archival data is available.",
+    annotationLead: "Use FRUS 1981-1988 Volume XXXVIII source-note formatting as model once exact archival data is available.",
     sourceNote: "Source-note target: National Archives, RG 56, Records of the Department of the Treasury, Office of the Assistant Secretary for International Affairs, [series], [box], [folder].",
-    catalogLabel: "Volume III source precedent",
-    catalogUrl: FRUS_1977_80_V03_SOURCES_URL
+    catalogLabel: "Volume XXXVIII source precedent",
+    catalogUrl: FRUS_1981_88_V38_SOURCES_URL
   },
   {
     status: "Request-first",
@@ -1633,8 +1630,8 @@ window.SELECTION_BOARD = [
     nextAction: "Execute RG 364 request packet and prioritize negotiation strategy or interagency-disagreement documents.",
     annotationLead: "Use USTR documents to explain public positions, not merely duplicate speeches.",
     sourceNote: "Source-note target: National Archives, RG 364, Records of the Office of the United States Trade Representative, [accession/series], [box], [folder].",
-    catalogLabel: "Volume III source precedent",
-    catalogUrl: FRUS_1977_80_V03_SOURCES_URL
+    catalogLabel: "Reagan-style source target",
+    catalogUrl: FRUS_1981_88_V38_SOURCES_URL
   },
   {
     status: "Boundary / exclude unless needed",
@@ -1882,10 +1879,10 @@ window.SOURCE_NOTE_PATTERNS = [
     repository: "National Archives",
     lane: lanes.monetary.name,
     patternType: "RG 56 Treasury files",
-    precedent: "Carter Volume III and Reagan Volume XXXVIII both place RG 56, Treasury office/series, accession, box, folder, classification, and routing in the note.",
+    precedent: "Published Reagan Volume XXXVIII places RG 56, Treasury office/series, box/folder, classification, and routing in repository-first source-note order.",
     precedentUrl: FRUS_1981_88_V38_D169_URL,
-    sourceBase: "FRUS 1977-1980 Volume III source list for Treasury and RG 56.",
-    sourceBaseUrl: FRUS_1977_80_V03_SOURCES_URL,
+    sourceBase: "FRUS 1981-1988 Volume XXXVIII source list for Treasury and RG 56.",
+    sourceBaseUrl: FRUS_1981_88_V38_SOURCES_URL,
     template: "Source: National Archives, RG 56, Records of the Department of the Treasury, [office/series], [accession], Box [box], [folder]. [Classification]. [Routing, action, or copy note].",
     volume37Use: "Use for Plaza/Louvre follow-through, G-5/G-7 finance minister coordination, Mulford/Brady/Regan files, and Treasury International Affairs records.",
     readyWhen: [
@@ -1901,15 +1898,15 @@ window.SOURCE_NOTE_PATTERNS = [
   },
   {
     id: "SNP-005",
-    status: "Copy-ready pattern",
+    status: "Target-only pattern",
     repository: "National Archives",
     lane: lanes.trade.name,
     patternType: "RG 364 USTR/STR files",
-    precedent: "Volume III RG 364 notes use record group, accession/series, Subject Files, date span, box, folder, then classification.",
-    precedentUrl: FRUS_1977_80_V03_D192_URL,
-    sourceBase: "FRUS 1977-1980 Volume III source list identifies RG 364 trade representative subject files.",
-    sourceBaseUrl: FRUS_1977_80_V03_SOURCES_URL,
-    template: "Source: National Archives, RG 364, Records of the Office of the United States Trade Representative, [accession or series], [subseries], Box [box], [folder]. [Classification]. [Drafting, attachment, or signature note].",
+    precedent: "Volume XXXVIII supplies the published Reagan subseries source-note order; RG 364 remains a target-only lane until exact USTR accession, series, box, and folder data are verified.",
+    precedentUrl: FRUS_1981_88_V38_SOURCES_URL,
+    sourceBase: "FRUS 1981-1988 Volume XXXVIII source-list order plus NARA RG 364 pull data.",
+    sourceBaseUrl: FRUS_1981_88_V38_SOURCES_URL,
+    template: "Source-note target: National Archives, RG 364, Records of the Office of the United States Trade Representative, [accession or series], [subseries], Box [box], [folder]. [Classification]. [Drafting, attachment, or signature note].",
     volume37Use: "Use for Canada FTA, GATT/Uruguay Round, Japan market access, agriculture, Super 301, and Omnibus Trade Act negotiation strategy.",
     readyWhen: [
       "USTR accession/series and box/folder are confirmed by NARA pull data.",
@@ -1928,11 +1925,11 @@ window.SOURCE_NOTE_PATTERNS = [
     repository: "National Archives",
     lane: lanes.summits.name,
     patternType: "RG 59 central and lot files",
-    precedent: "Volume III identifies RG 59 Central Foreign Policy File and State lot files as distinct source-note lanes.",
-    precedentUrl: FRUS_1977_80_V03_SOURCES_URL,
-    sourceBase: "FRUS 1977-1980 Volume III source list for RG 59 Central Foreign Policy File and lot files.",
-    sourceBaseUrl: FRUS_1977_80_V03_SOURCES_URL,
-    template: "Source-note target: National Archives, RG 59, [Central Foreign Policy File, document number OR office/lot file title], [lot/accession if applicable], Box [box], [folder]. [Classification].",
+    precedent: "Volume XXXVIII identifies Department of State Central Foreign Policy File records and State lot files as distinct source-note lanes.",
+    precedentUrl: FRUS_1981_88_V38_SOURCES_URL,
+    sourceBase: "FRUS 1981-1988 Volume XXXVIII source list for State Central Foreign Policy File and lot files.",
+    sourceBaseUrl: FRUS_1981_88_V38_SOURCES_URL,
+    template: "Source-note target: Department of State, [Central Foreign Policy File document identifier OR office/lot file title], [lot/accession if applicable], Box [box], [folder]. [Classification].",
     volume37Use: "Use for summit preparatory cables, State economic reporting, EB/E summit files, and allied positions on trade, exchange rates, and summit declarations.",
     readyWhen: [
       "The row distinguishes CFPF document numbers from lot-file office records.",
@@ -1974,8 +1971,8 @@ window.SOURCE_NOTE_PATTERNS = [
     repository: "Reagan Library",
     lane: lanes.boundary.name,
     patternType: "President's Daily Diary",
-    precedent: "Volume III lists presidential daily diary material as a source base, while document notes use it mainly when no meeting memorandum is found.",
-    precedentUrl: FRUS_1977_80_V03_SOURCES_URL,
+    precedent: "Volume XXXVIII lists President's Daily Diary material as a Reagan Library source base, while document notes use it mainly for date, place, and meeting corroboration.",
+    precedentUrl: FRUS_1981_88_V38_SOURCES_URL,
     sourceBase: "Reagan Library Daily Diary research lane.",
     sourceBaseUrl: "https://www.reaganlibrary.gov/archives/reagans-daily-diary",
     template: "Cross-reference target: Reagan Library, President Reagan's Daily Diary, [date]. Use for time, place, attendees, and call/meeting corroboration unless the diary itself is selected.",
@@ -2196,8 +2193,8 @@ window.PRODUCTION_READINESS = [
     compilerMove: "Treat as the highest production blocker for Volume XXXVII.",
     sourcePattern: "SNP-004",
     sourceNote: "Source-note target: National Archives, RG 56, Records of the Department of the Treasury, Office of the Assistant Secretary for International Affairs, [series], [box], [folder].",
-    catalogLabel: "Volume III source precedent",
-    catalogUrl: FRUS_1977_80_V03_SOURCES_URL
+    catalogLabel: "Volume XXXVIII source precedent",
+    catalogUrl: FRUS_1981_88_V38_SOURCES_URL
   },
   {
     id: "PR-010",
@@ -2218,8 +2215,8 @@ window.PRODUCTION_READINESS = [
     compilerMove: "Run this pull before finalizing Canada FTA, GATT/Uruguay Round, Japan, agriculture, or Omnibus Trade Act selections.",
     sourcePattern: "SNP-005",
     sourceNote: "Source-note target: National Archives, RG 364, Records of the Office of the United States Trade Representative, [accession/series], [box], [folder].",
-    catalogLabel: "Volume III source precedent",
-    catalogUrl: FRUS_1977_80_V03_SOURCES_URL
+    catalogLabel: "Reagan-style source target",
+    catalogUrl: FRUS_1981_88_V38_SOURCES_URL
   },
   {
     id: "PR-011",
@@ -2294,11 +2291,11 @@ window.ANNOTATION_QUEUE = [
     annotationQuestion: "What negotiation context is needed so public trade rhetoric does not substitute for internal USTR strategy?",
     draftPrompt: "After RG 364 records are pulled, explain only the specific negotiation track, dispute, or interagency disagreement in the selected document.",
     verificationNeeded: "Confirm accession/series, box, folder, document author/date, and whether tabs are printed, omitted, or not found.",
-    sourceHook: "NARA RG 364 USTR files modeled on the Carter foreign economic policy volume.",
+    sourceHook: "NARA RG 364 USTR files ordered against the published Reagan Volume XXXVIII source-note model until exact USTR accession data is verified.",
     boundaryRule: "Exclude domestic-only trade legislation unless the selected record directly shapes foreign economic diplomacy.",
     exportNote: "Cannot draft final annotation until RG 364 document-level evidence exists.",
-    sourceLabel: "Volume III source precedent",
-    sourceUrl: FRUS_1977_80_V03_SOURCES_URL
+    sourceLabel: "Reagan-style source target",
+    sourceUrl: FRUS_1981_88_V38_SOURCES_URL
   },
   {
     id: "AQ-004",
@@ -2333,8 +2330,8 @@ window.ANNOTATION_QUEUE = [
     sourceHook: "NARA RG 56 Treasury International Affairs request packet and Fed channel follow-up.",
     boundaryRule: "Route debt-rescheduling material to Volume XXXVIII unless it drives exchange-rate or summit macroeconomic policy.",
     exportNote: "Highest-value monetary annotation blocker.",
-    sourceLabel: "Volume III source precedent",
-    sourceUrl: FRUS_1977_80_V03_SOURCES_URL
+    sourceLabel: "Volume XXXVIII source precedent",
+    sourceUrl: FRUS_1981_88_V38_SOURCES_URL
   },
   {
     id: "AQ-006",

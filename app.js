@@ -1548,29 +1548,29 @@ function sourcePrecedentProfile(row) {
   const family = row.formatFamily;
   if (family === "NARA RG 56") {
     return {
-      precedentModel: "Volume III RG 56 Treasury record",
-      officialModel: "FRUS 1977-1980 Volume III source list and Document 258, note 1",
-      sourceListUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/sources",
-      exampleUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/d258",
+      precedentModel: "Volume XXXVIII RG 56 Treasury record",
+      officialModel: "FRUS 1981-1988 Volume XXXVIII source list and Treasury document notes",
+      sourceListUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/sources",
+      exampleUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/d169",
       expectedShape: "Source: National Archives, RG 56, Records of [Treasury office/series], Box [number], [folder]. [Classification/handling]. [Review, routing, copy, or notation sentence when present]."
     };
   }
   if (family === "NARA RG 59") {
     return {
-      precedentModel: "Volume III RG 59 State central/lot file",
-      officialModel: "FRUS 1977-1980 Volume III source list",
-      sourceListUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/sources",
-      exampleUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/sources",
-      expectedShape: "Source: National Archives, RG 59, [Central Foreign Policy File document number OR office lot-file title], [lot/accession if applicable], Box [number], [folder]. [Classification/handling]."
+      precedentModel: "Volume XXXVIII State central/lot file",
+      officialModel: "FRUS 1981-1988 Volume XXXVIII source list",
+      sourceListUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/sources",
+      exampleUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/sources",
+      expectedShape: "Source: Department of State, [Central Foreign Policy File document identifier OR office lot-file title], [lot/accession if applicable], Box [number], [folder]. [Classification/handling]."
     };
   }
   if (family === "NARA RG 364") {
     return {
-      precedentModel: "Volume III RG 364 trade representative files",
-      officialModel: "FRUS 1977-1980 Volume III source list",
-      sourceListUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/sources",
-      exampleUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/sources",
-      expectedShape: "Source: National Archives, RG 364, [Trade Representative records/subject files], [accession or series], Box [number], [folder]. [Classification/handling]. [Drafting, attachment, or signature note when present]."
+      precedentModel: "Reagan-style RG 364 source target",
+      officialModel: "FRUS 1981-1988 Volume XXXVIII repository-first source-note order",
+      sourceListUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/sources",
+      exampleUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/sources",
+      expectedShape: "Source-note target: National Archives, RG 364, [Trade Representative records/subject files], [accession or series], Box [number], [folder]. [Classification/handling]. [Drafting, attachment, or signature note when present]."
     };
   }
   if (family === "Reagan Library") {
@@ -1594,9 +1594,9 @@ function sourcePrecedentProfile(row) {
   if (family === "Daily Diary") {
     return {
       precedentModel: "Presidential Daily Diary cross-reference",
-      officialModel: "Volume III and Volume XXXVIII source lists include Presidential Daily Diary holdings",
+      officialModel: "FRUS 1981-1988 Volume XXXVIII source list includes President's Daily Diary holdings",
       sourceListUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/sources",
-      exampleUrl: "https://history.state.gov/historicaldocuments/frus1977-80v03/d26",
+      exampleUrl: "https://history.state.gov/historicaldocuments/frus1981-88v38/sources",
       expectedShape: "Cross-reference target: Reagan Library, President Reagan's Daily Diary, [date]. Use for time, place, attendees, and no-memorandum checks unless the diary itself is selected."
     };
   }

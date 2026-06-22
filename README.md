@@ -21,7 +21,7 @@ The page is deliberately source-first: every cue is meant to remain reviewable, 
 - source-note QA audit with FRUS-format filters and copyable fix list for ready notes, target notes, references, and rows needing review
 - separate Reagan Library source-note section listing exact `Source: Reagan Library, ...` citations with bracketed templates excluded
 - source coverage matrix with lane/format readiness counts, copyable brief, and CSV export
-- source-note precedent-match queue keyed to official Volume III, Volume XXXVIII, Public Papers, Daily Diary, and adjacent-volume models
+- source-note precedent-match queue keyed to the published Reagan Volume XXXVIII model, Reagan Public Papers, Daily Diary, and adjacent-volume boundaries
 - Daily Diary date-control queue for public endpoints, summit anchors, calls, and meeting-context checks
 - source-note pattern lab for Reagan Library, NARA, Public Papers, NSDD, and Daily Diary citation formats
 - selection board with copyable filtered dossiers for draft candidates, context anchors, request-first leads, and boundary/exclusion calls
@@ -34,7 +34,7 @@ The page is deliberately source-first: every cue is meant to remain reviewable, 
 - policy file anchors for Reagan Library, Public Papers, Treasury/Fed routing, and adjacent FRUS volumes
 - declassified Reagan Library leads from Danzansky, Baker, and Sprinkel files
 - NARA Scout and NARA.gov Catalog search anchors for RG 56, RG 59, RG 364, and declassified hit verification
-- NARA RG 56, RG 59, and RG 364 source-note targets modeled on the same compiler's Carter foreign economic policy volume
+- NARA RG 56, RG 59, and RG 364 source-note targets ordered against the published Reagan subseries Volume XXXVIII model; RG 364 remains target-only until exact accession/series data is confirmed
 - public-line reference layer
 - searchable/exportable boundary-control rows for adjacent FRUS volumes and excluded domestic-only material
 - resilient copy buttons for source notes, request text, selection memos, annotation prompts, and assembly notes
@@ -64,7 +64,6 @@ node --check data/persons.js
 - Official Volume XXXVII page: <https://history.state.gov/historicaldocuments/frus1981-88v37>
 - Reagan Foundations model volume: <https://history.state.gov/historicaldocuments/frus1981-88v01>
 - Reagan Foundations source list: <https://history.state.gov/historicaldocuments/frus1981-88v01/sources>
-- FRUS Volume III source-note precedent: <https://history.state.gov/historicaldocuments/frus1977-80v03/sources>
 - Reagan administration FRUS volume list: <https://history.state.gov/historicaldocuments/reagan>
 - NARA Scout: <https://therealjameswilson.github.io/nara-scout/>
 - NARA Catalog: <https://catalog.archives.gov/>
@@ -77,7 +76,7 @@ node --check data/persons.js
 
 ## Source-Note Discipline
 
-FRUS 1977-1980, Volume III was compiled by Kathleen B. Rasmussen and is the source-note model for this page.
+FRUS 1981-1988, Volume XXXVIII is the published Reagan subseries source-note model for this page.
 Rows marked `Source:` are copy-ready only when repository, collection, box, folder, and classification/handling are specific.
 Rows marked `Source-note target` are archival leads that still need exact box/folder or record-group data before publication.
 
